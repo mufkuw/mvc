@@ -1,0 +1,13 @@
+{
+    "name": "mufkuw/mvc",
+    "description": "Description of project mvc.",
+    "authors": [
+        {
+            "name": "Muffaddal Kalla",
+            "email": "mufkuw@gmail.com"
+        }
+    ],
+    "require": {
+        "smarty/smarty": "v3.1.31"
+    }
+}
