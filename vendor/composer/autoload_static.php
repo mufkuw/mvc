@@ -8,11 +8,28 @@ class ComposerStaticInitd506e7354b0e8b538f444097ab890120
 {
     public static $files = array (
         'f084d01b0a599f67676cffef638aa95b' => __DIR__ . '/..' . '/smarty/smarty/libs/bootstrap.php',
+        '1032c3e1f38c3e036168244351316be0' => __DIR__ . '/../..' . '/src/bootstrap.php',
+    );
+
+    public static $prefixLengthsPsr4 = array (
+        'M' => 
+        array (
+            'Mvc\\' => 4,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'Mvc\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
+        ),
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInitd506e7354b0e8b538f444097ab890120::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitd506e7354b0e8b538f444097ab890120::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }
