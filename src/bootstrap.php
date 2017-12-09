@@ -54,7 +54,6 @@ set_error_handler(function($errno, $errstr, $errfile, $errline, $class) {
 });
 
 require 'config_tools.php';
-require 'config_smarty.php';
 
 /**
  * Instantiate the MVC pattern
@@ -110,9 +109,15 @@ function mvc_init($pSetup = []) {
 	Context::instance()->setup = $pSetup;
 	Context::instance()->route = Router::getRoute();
 
+	print_pre(Context::instance()->route);
+
 	if (isset($pSetup['cookie_name'])) {
 		Context::instance()->cookie = new Cookie($pSetup['cookie_name']);
 	}
 
+	Context::instance()->theme = Theme::instance();
+
 	Context::instance()->view = SmartyView::instance();
+
+	require 'config_smarty.php';
 }
