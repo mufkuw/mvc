@@ -1,5 +1,7 @@
 <?php
 
+namespace Mvc;
+
 class Theme extends Foundation {
 
 	private $current_theme = 'default';
@@ -41,7 +43,7 @@ class Theme extends Foundation {
 
 }
 
-class TemplateNotFoundException extends Exception {
+class TemplateNotFoundException extends \Exception {
 
 	public function __construct($template) {
 		parent::__construct("The templete you are trying to fetch does not exists $template", 0, null);
