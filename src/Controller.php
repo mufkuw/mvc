@@ -38,7 +38,7 @@ class Controller extends Foundation {
 			die(0);
 		}
 		$params['params'] = $params;
-		$output = Invoker::invoke([$this, 'ajax' . ucwords($c)], $params);
+		$output = invoke_function([$this, 'ajax' . ucwords($c)], $params);
 
 		header('Alerts : ' . json_encode($this->alerts));
 
@@ -62,7 +62,7 @@ class Controller extends Foundation {
 			$controller = new $controller;
 			$method_name = 'action' . ucwords($route['action']);
 			if (method_exists($controller, $method_name)) {
-				Invoker::invoke([$controller, $method_name], $route);
+				invoke_function([$controller, $method_name], $route);
 			} else {
 				die_page_not_found();
 			}

@@ -53,7 +53,8 @@ set_error_handler(function($errno, $errstr, $errfile, $errline, $class) {
 	return true;
 });
 
-require 'tools.php';
+require 'config_tools.php';
+require 'config_smarty.php';
 
 /**
  * Instantiate the MVC pattern
