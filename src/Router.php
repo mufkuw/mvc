@@ -4,7 +4,6 @@ namespace Mvc;
 
 class Router {
 
-	private static $route;
 	private static $routes = array();
 
 	private static function route($name, $pattern, $defaults = NULL) {
