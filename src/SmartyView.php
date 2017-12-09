@@ -13,7 +13,7 @@ class SmartyView extends Foundation {
 
 		$this->smarty = New \Smarty;
 
-		$cache_path = $this->context()->cache_path;
+		$cache_path = Context::instance()->cache_path;
 
 		$this->smarty->setTemplateDir($cache_path . '/smarty/template/');
 		$this->smarty->setCompileDir($cache_path . '/smarty/compiled/');

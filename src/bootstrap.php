@@ -113,4 +113,6 @@ function mvc_init($pSetup = []) {
 	if (isset($pSetup['cookie_name'])) {
 		Context::instance()->cookie = new Cookie($pSetup['cookie_name']);
 	}
+
+	Context::instance()->view = SmartyView::instance();
 }

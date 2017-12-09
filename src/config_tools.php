@@ -258,3 +258,8 @@ function invoke_function($pCallable, $pArgs = null) {
 
 	return call_user_func_array($pCallable, $receiving_array);
 }
+
+function die_page_not_found() {
+	header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found", true, 404);
+	die();
+}
