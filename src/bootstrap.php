@@ -74,6 +74,7 @@ require 'config_tools.php';
 function mvc_init($pSetup = []) {
 
 	$default_setup = [
+		'namespace' => 'App',
 		'cache_path' => 'cache',
 		'controllers_path' => 'controllers',
 		'themes_path' => 'themes',
@@ -109,8 +110,6 @@ function mvc_init($pSetup = []) {
 	Context::instance()->setup = $pSetup;
 	Context::instance()->route = Router::getRoute();
 
-	print_pre(Context::instance()->route);
-
 	if (isset($pSetup['cookie_name'])) {
 		Context::instance()->cookie = new Cookie($pSetup['cookie_name']);
 	}
@@ -118,6 +117,8 @@ function mvc_init($pSetup = []) {
 	Context::instance()->theme = Theme::instance();
 
 	Context::instance()->view = SmartyView::instance();
+
+	Controller::execute(Router::getRoute());
 
 	require 'config_smarty.php';
 }

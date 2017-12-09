@@ -18,8 +18,9 @@ class Controller extends Foundation {
 
 		$this->view = new SmartyView();
 		$this->theme = new Theme();
-		$this->context()->controller = $this;
-		$this->cookies = $this->context()->cookies;
+		Context::instance()->controller = $this;
+		$this->cookies = Context::instance()->cookie;
+		$this->route = Router::getRoute();
 	}
 
 	//ajax actions function starts with ajax
@@ -55,19 +56,33 @@ class Controller extends Foundation {
 
 	public static function execute($route) {
 
-		$controller = ucwords($route['controller']) . "Controller";
-		$method_name = 'action' . ucwords($route['action']);
+		//posible controllers namespace defination to purpose the search
+		$search_path = [
+			Context::instance()->setup['namespace'] . '\\Controllers', //search with App\Controllers
+			Context::instance()->setup['namespace'], // search with App\
+			'' //search directly without namespace
+		];
 
-		if (class_exists($controller, true)) {
-			$controller = new $controller;
+
+		foreach ($search_path as $namespace) {
+
+			$namespace = Context::instance()->setup['namespace'] . '\\Controllers';
+
+			$controller = $namespace . '\\' . ucwords($route['controller']) . "Controller";
 			$method_name = 'action' . ucwords($route['action']);
-			if (method_exists($controller, $method_name)) {
-				invoke_function([$controller, $method_name], $route);
+
+			if (class_exists($controller, true)) {
+				$controller = new $controller;
+				$method_name = 'action' . ucwords($route['action']);
+				if (method_exists($controller, $method_name)) {
+					invoke_function([$controller, $method_name], $route);
+					die();
+				} else {
+					die_page_not_found();
+				}
 			} else {
 				die_page_not_found();
 			}
-		} else {
-			die_page_not_found();
 		}
 	}
 
@@ -186,19 +201,7 @@ class Controller extends Foundation {
 	}
 
 	private function getCurrentAction() {
-		$traces = debug_backtrace(2, 0);
-		$action = '';
-		foreach ($traces as $trace) {
-			if (substr($trace['function'], 0, 6) == 'action') {
-				$action = strtolower(str_replace('action', '', $trace['function']));
-				break;
-			}
-		}
-
-		if ($action == '')
-			$action = $this->route['action'];
-
-		return $action;
+		return $this->route['action'];
 	}
 
 	private function getCurrentController() {

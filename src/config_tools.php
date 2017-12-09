@@ -241,7 +241,7 @@ function condition_and($variable, ...$values) {
 function invoke_function($pCallable, $pArgs = null) {
 	$params = [];
 	if (is_array($pCallable))
-		$params = (new ReflectionMethod($pCallable[0], $pCallable[1]))->getParameters();
+		$params = (new \ReflectionMethod($pCallable[0], $pCallable[1]))->getParameters();
 	else if (is_a($pCallable, 'Closure'))
 		$params = (new \ReflectionFunction($pCallable))->getParameters();
 

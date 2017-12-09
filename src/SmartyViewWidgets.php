@@ -6,7 +6,7 @@ class SmartyViewWidgets extends Foundation {
 
 	public function register($smarty) {
 		$theme = Context::instance()->theme;
-		$files = rdir($theme->getThemePath());
+		$files = rdir($theme->getCurrentThemePath());
 		$files = array_filter($files, function($item) {
 			$matches = [];
 			preg_match('/^template-(.*).html/', $item['name'], $matches);

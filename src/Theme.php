@@ -14,31 +14,34 @@ class Theme extends Foundation {
 		$this->current_theme = $theme;
 	}
 
-	public function getThemePath() {
-		return Context::instance()->setup['themes_path'] . $this->current_theme . DS;
+	public function getCurrentThemePath() {
+		return ROOT . Context::instance()->setup['themes_path'] . DS . $this->current_theme . DS;
+	}
+
+	public function getDefaultThemePath() {
+		return ROOT . Context::instance()->setup['themes_path'] . DS . Context::instance()->setup['default_theme'] . DS;
 	}
 
 	public function getTemplate($file) {
 		$search_paths = [];
 		$search_paths[] = $file;
-		$search_paths[] = $file . ' . html';
+		$search_paths[] = $file . '.html';
 
 
 		foreach ($search_paths as $path) {
 
-			$full_path_default = realpath(Context::instance()->setup['themes_path'] . Context::instance()->setup['default_theme'] . DS . $path);
-			$full_path = realpath(Context::instance()->setup['themes_path'] . $this->current_theme . DS . $path);
+			$full_path_default = realpath(Context::instance()->theme->getDefaultThemePath() . $path);
+			$full_path = realpath(Context::instance()->theme->getCurrentThemePath() . $path);
 
 			if ($full_path && file_exists($full_path))
 				return $full_path;
 			else {
 				if ($full_path_default && file_exists($full_path_default))
 					return $full_path_default;
-				else {
-					throw new TemplateNotFoundException($file);
-				}
 			}
 		}
+
+		throw new TemplateNotFoundException($file);
 	}
 
 }
