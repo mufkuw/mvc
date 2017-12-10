@@ -263,3 +263,11 @@ function die_page_not_found() {
 	header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found", true, 404);
 	die();
 }
+
+/*
+ * Translator Provider
+ */
+
+function l($string) {
+	return $string;
+}

@@ -21,6 +21,7 @@ class Controller extends Foundation {
 		Context::instance()->controller = $this;
 		$this->cookies = Context::instance()->cookie;
 		$this->route = Router::getRoute();
+		$this->media = new Media('Layout');
 	}
 
 	//ajax actions function starts with ajax
@@ -169,7 +170,6 @@ class Controller extends Foundation {
 
 		$layout = 'layout';
 
-		$this->view->HEADER_SETTINGS = $this->headerSettings();
 		$this->view->HEADER_HTML = $this->header();
 		$this->view->FOOTER_HTML = $this->footer();
 		$this->view->ALERTS = $this->renderAlerts();
@@ -206,6 +206,14 @@ class Controller extends Foundation {
 
 	private function getCurrentController() {
 		return $this->route['controller'];
+	}
+
+	public function header() {
+
+	}
+
+	public function footer() {
+
 	}
 
 }

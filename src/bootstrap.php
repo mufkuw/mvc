@@ -118,7 +118,7 @@ function mvc_init($pSetup = []) {
 
 	Context::instance()->view = SmartyView::instance();
 
-	Controller::execute(Router::getRoute());
+	//Controller::execute(Router::getRoute());
 
 	require 'config_smarty.php';
 }
