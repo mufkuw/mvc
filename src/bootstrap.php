@@ -24,7 +24,7 @@ if (!defined('MVC_DEFAULT_TEMPLATES')) {
 }
 
 if (!defined('MVC_DEFAULT_MEDIA')) {
-	define('MVC_DEFAULT_MEDIA', MVC_ROOT . DS . 'Media' . DS);
+	define('MVC_DEFAULT_MEDIA', '/vendor/mufkuw/mvc/src/Media' . DS);
 }
 
 if (!defined('DEBUG'))
