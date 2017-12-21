@@ -2,6 +2,8 @@
 
 namespace Mvc;
 
+use ReflectionFunction;
+
 class Hook {
 
 	/**
@@ -16,7 +18,6 @@ class Hook {
 	private static $hook_register = array();
 
 	public static function register($event, $callback) {
-
 		$registrant = self::getRegistrant($callback);
 		$registrant_ref = self::getRegistrantRef($callback);
 
@@ -49,12 +50,18 @@ class Hook {
 		return 'hook' . str_replace('.', '', ucwords($event, '.'));
 	}
 
+	/**
+	 * Execute Hook
+	 *
+	 * @param $event  Name of the event to execute
+	 * @param $params  Array of Named parameter passed to the event handler
+	 * @param $callbackProcessResult  Callback Function with ($success, $hook_results) Parameters
+	 */
 	public static function execute($event, $params = null, $callbackProcessResult = null) {
 
 		//event as string name
 		//params passing to event args
 		//callback takes in two parameters success, results
-
 
 		$caller = "";
 		$event_params = ""; {
@@ -86,7 +93,7 @@ class Hook {
 					$e = null;
 					try {
 						$params['pEvent'] = $event;
-						$r = Invoker::invoke($callback, $params);
+						$r = invoke_function($callback, $params);
 					} catch (Exception $exception) {
 						$e = $exception->getMessage();
 						$success = false;

@@ -1,7 +1,5 @@
 <?php
 
-namespace Mvc;
-
 function print_pre($var, $return = false) {
 	$res = '<pre>' . print_r($var, true) . '</pre>';
 	if ($return)

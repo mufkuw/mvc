@@ -4,9 +4,12 @@ namespace Mvc;
 
 class SmartyViewWidgets extends Foundation {
 
+	private $smarty;
+
 	public function register($smarty) {
+		$this->smarty = $smarty;
 		$theme = Context::instance()->theme;
-		$files = rdir($theme->getCurrentThemePath());
+		$files = array_merge(rdir($theme->getCurrentThemePath()), rdir(MVC_DEFAULT_TEMPLATES));
 		$files = array_filter($files, function($item) {
 			$matches = [];
 			preg_match('/^template-(.*).html/', $item['name'], $matches);
@@ -23,7 +26,9 @@ class SmartyViewWidgets extends Foundation {
 	}
 
 	public function __call($method, $args) {
+
 		if (substr($method, 0, 8) == '_Widget_') {
+
 			$widget = strtolower(str_replace('_Widget_', '', $method));
 			$params = $args[0];
 			$params['template'] = 'template-' . str_replace('_', '-', $widget);
@@ -38,7 +43,7 @@ class SmartyViewWidgets extends Foundation {
 
 			$params['attributes'] = $attribute_html;
 
-			return _SmartyView_Include_Function($params, $smarty);
+			return SmartyView::instance()->_SmartyView_Include_Function($params, $this->smarty);
 		}
 	}
 

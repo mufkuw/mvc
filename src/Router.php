@@ -123,6 +123,8 @@ class Router {
 					unset($route_params['controller']);
 					unset($route_params['action']);
 
+					$route_params['request_method'] = $_SERVER['REQUEST_METHOD'];
+
 					$params['params'] = array_merge($route_params, $route['params']);
 
 					return $params;

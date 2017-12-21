@@ -1,12 +1,31 @@
 <?php
 
-namespace Mvc;
+use Mvc\{
+	Context,
+	Router,
+	Controller,
+	Cookie,
+	Theme,
+	SmartyView
+};
 
 if (!defined('DS'))
 	define('DS', DIRECTORY_SEPARATOR);
 
 if (!defined('ROOT'))
 	define('ROOT', realpath($_SERVER['DOCUMENT_ROOT']) . DS);
+
+if (!defined('MVC_ROOT')) {
+	define('MVC_ROOT', __DIR__);
+}
+
+if (!defined('MVC_DEFAULT_TEMPLATES')) {
+	define('MVC_DEFAULT_TEMPLATES', MVC_ROOT . DS . 'Templates' . DS);
+}
+
+if (!defined('MVC_DEFAULT_MEDIA')) {
+	define('MVC_DEFAULT_MEDIA', MVC_ROOT . DS . 'Media' . DS);
+}
 
 if (!defined('DEBUG'))
 	define('DEBUG', 1);
@@ -59,16 +78,25 @@ require 'config_tools.php';
  * Instantiate the MVC pattern
  *
  * Following $pSetup array elements expected as parameter
- * @param 'caches_path' => '',
- * @param 'controllers_path' => '',
- * @param 'themes_path' => '',
- * @param 'modules_path' => '',
- * @param 'default_theme' => '',
- * @param 'cookie_name' => '',
+ * @param 'namespace' => 'App',
+ * @param 'cache_path' => 'cache',
+ * @param 'controllers_path' => 'controllers',
+ * @param 'themes_path' => 'themes',
+ * @param 'modules_path' => 'modules',
+ * @param 'default_theme' => 'default',
+ * @param 'cookie_name' => 'your_choice_name',
  * @param 'routes' => '[
- * 		'name' => 'route_name',
+ * 		'name' => 'routename',
  * 		'pattern' => 'regex',
- * 		'defaults' => array(of key value to be passed) THIS SETTING OPTIONAL,
+ * 		'defaults' => [
+ * 				controller =>''
+ * 				action =>''
+ * 				action_id =>''
+ * 				module =>''
+ * 				module_controller =>''
+ * 				module_action =>''
+ * 				module_action_id =>''
+ * 			],
  * 	]',
  */
 function mvc_init($pSetup = []) {
@@ -79,7 +107,8 @@ function mvc_init($pSetup = []) {
 		'controllers_path' => 'controllers',
 		'themes_path' => 'themes',
 		'modules_path' => 'modules',
-		'default_theme' => 'default'
+		'default_theme' => 'default',
+		'auto_route' => 1
 	];
 
 	$pSetup = array_merge($default_setup, $pSetup);
@@ -107,18 +136,21 @@ function mvc_init($pSetup = []) {
 		}
 	}
 
+
 	Context::instance()->setup = $pSetup;
 	Context::instance()->route = Router::getRoute();
 
 	if (isset($pSetup['cookie_name'])) {
 		Context::instance()->cookie = new Cookie($pSetup['cookie_name']);
+	} else {
+		Context::instance()->cookie = new Cookie($pSetup['namespace']);
 	}
 
 	Context::instance()->theme = Theme::instance();
 
 	Context::instance()->view = SmartyView::instance();
 
-	//Controller::execute(Router::getRoute());
-
-	require 'config_smarty.php';
+	if ($pSetup['auto_route']) {
+		Controller::execute(Router::getRoute());
+	}
 }

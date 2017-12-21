@@ -83,15 +83,21 @@ class Media extends Foundation {
 		if (!$file)
 			return $file;
 
+		print_pre(ROOT);
+
 		$search_paths = array();
 		$search_paths[] = $file;
-		$search_paths[] = $theme->getCurrentThemePath() . '' . $type . DS . $file;
-		$search_paths[] = DS . str_replace(ROOT, '', Context::instance()->setup['modules_path']) . $module . DS . $type . DS . $file;
+		$search_paths[] = $theme->getCurrentThemePath(true) . '' . $type . DS . $file;
+		$search_paths[] = $theme->getDefaultThemePath(true) . '' . $type . DS . $file;
+		$search_paths[] = str_replace(ROOT, '', MVC_DEFAULT_MEDIA . '' . $type . DS . $file);
+		$search_paths[] = str_replace(ROOT, '', Context::instance()->setup['modules_path']) . $module . DS . $type . DS . $file;
+
+		print_pre($search_paths);
 
 		foreach ($search_paths as $path) {
-			if (realpath(ROOT . $path))
+			if (realpath($path))
 				return $path;
-			if (realpath(ROOT . $path . '.' . $type))
+			if (realpath($path . '.' . $type))
 				return $path . '.' . $type;
 		}
 		return $file;

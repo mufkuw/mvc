@@ -16,15 +16,23 @@ class Controller extends Foundation {
 	public function __construct() {
 		parent::__construct();
 
-		$this->view = new SmartyView();
-		$this->theme = new Theme();
+		$this->view = SmartyView::instance();
+		$this->theme = Theme::instance();
 		Context::instance()->controller = $this;
 		$this->cookies = Context::instance()->cookie;
 		$this->route = Router::getRoute();
+		$this->view->page_title = ucwords($this->route['controller'] . " " . $this->route['action']);
 		$this->media = new Media('Layout');
+
+		Hook::register('setting.media.layout', function($pMedia) {
+			$pMedia->addCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", false);
+			$pMedia->addCss("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", false);
+			$pMedia->addJs("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js", false);
+			$pMedia->addJs("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", false);
+		});
 	}
 
-	//ajax actions function starts with ajax
+//ajax actions function starts with ajax
 	public function actionX($id, $params, $c) {
 
 		$invalidAjax = !isset($c);  // if c is not passed as querystring param c=test
@@ -61,30 +69,35 @@ class Controller extends Foundation {
 		$search_path = [
 			Context::instance()->setup['namespace'] . '\\Controllers', //search with App\Controllers
 			Context::instance()->setup['namespace'], // search with App\
+			'Mvc\\Controllers', //search with Mvc\Controllers
 			'' //search directly without namespace
 		];
 
+		$success = false;
 
 		foreach ($search_path as $namespace) {
-
-			$namespace = Context::instance()->setup['namespace'] . '\\Controllers';
-
 			$controller = $namespace . '\\' . ucwords($route['controller']) . "Controller";
 			$method_name = 'action' . ucwords($route['action']);
-
 			if (class_exists($controller, true)) {
 				$controller = new $controller;
-				$method_name = 'action' . ucwords($route['action']);
-				if (method_exists($controller, $method_name)) {
-					invoke_function([$controller, $method_name], $route);
-					die();
-				} else {
-					die_page_not_found();
+
+				$method_names = [
+					'action' . ucwords(strtolower($route['params']['request_method'])) . ucwords($route['action']),
+					'action' . ucwords($route['action']),
+				];
+				$route['params'] = array_merge($route['params'], $_POST, $_GET);
+				$route['params']['params'] = $route['params'];
+				foreach ($method_names as $method_name) {
+					if (method_exists($controller, $method_name)) {
+						invoke_function([$controller, $method_name], $route['params']);
+						$success = true;
+						break;
+					}
 				}
-			} else {
-				die_page_not_found();
 			}
 		}
+		if (!$success)
+			die_page_not_found();
 	}
 
 	public function viewJson($object) {

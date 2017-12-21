@@ -3,9 +3,10 @@
 namespace Mvc;
 
 //register smarty plugins
-smarty_plugnis_setups();
+smarty_plugins_setups();
 
-function smarty_plugnis_setups() {
+function smarty_plugins_setups() {
+
 	$view = SmartyView::instance();
 
 	$view->registerPlugin('function', 'l', 'Mvc\_SmartyView_LanguageTranslationProvider_Function');
@@ -17,8 +18,8 @@ function smarty_plugnis_setups() {
 	$view->registerPlugin('modifier', 'null', 'Mvc\_SmartyView_Null_Modifier');
 
 
-	//$view->registerPlugin('function'	,'html_widget'				,'_SmartyView_Widget_Function');
-	//$view->registerPlugin('function'	,'alert'					,'_SmartyView_Widget_Alert_Function');
+	$view->registerPlugin('function', 'html_widget', 'Mvc\_SmartyView_Widget_Function');
+	$view->registerPlugin('function', 'alert', 'Mvc\_SmartyView_Widget_Alert_Function');
 
 	SmartyViewWidgets::instance()->register($view);
 }
@@ -50,6 +51,7 @@ function _SmartyView_LanguageTranslationProvider_Function($param, &$smarty) {
 function _SmartyView_Include_Function($params, &$smarty) {
 
 	$view = SmartyView::instance();
+
 	$theme = Context::instance()->theme;
 
 	$path = $theme->getTemplate($params['template']);
@@ -89,4 +91,12 @@ function _SmartyView_Hidden_Function($params, &$smarty) {
 	}
 
 	return $html;
+}
+
+function _SmartyView_Widget_Function($params, &$smarty) {
+
+}
+
+function _SmartyView_Widget_Alert_Function($params, &$smarty) {
+
 }

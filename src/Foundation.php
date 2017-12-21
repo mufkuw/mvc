@@ -8,7 +8,7 @@ class Foundation {
 	private $internal_data = [];
 
 	public function __construct() {
-		
+
 	}
 
 	public static function instance() {
