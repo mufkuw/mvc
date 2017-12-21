@@ -16,14 +16,14 @@ class Theme extends Foundation {
 
 	public function getCurrentThemePath($pNeedLogicalPath = false) {
 		if ($pNeedLogicalPath)
-			return Context::instance()->setup['themes_path'] . DS . $this->current_theme . DS;
+			return str_replace('\\', '/', Context::instance()->setup['themes_path'] . DS . $this->current_theme . DS);
 		else
 			return ROOT . Context::instance()->setup['themes_path'] . DS . $this->current_theme . DS;
 	}
 
 	public function getDefaultThemePath($pNeedLogicalPath = false) {
 		if ($pNeedLogicalPath)
-			return Context::instance()->setup['themes_path'] . DS . Context::instance()->setup['default_theme'] . DS;
+			return str_replace('\\', '/', Context::instance()->setup['themes_path'] . DS . Context::instance()->setup['default_theme'] . DS);
 		else
 			return ROOT . Context::instance()->setup['themes_path'] . DS . Context::instance()->setup['default_theme'] . DS;
 	}

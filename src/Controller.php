@@ -183,8 +183,16 @@ class Controller extends Foundation {
 
 		$layout = 'layout';
 
+		$this->media->addJs('bootstrap_layout');
+		$this->media->addCss('bootstrap_layout');
+
+
 		$this->view->HEADER_HTML = $this->header();
 		$this->view->FOOTER_HTML = $this->footer();
+
+		$this->media->addJs('bootstrap_alerts');
+		$this->media->addCss('bootstrap_alerts');
+
 		$this->view->ALERTS = $this->renderAlerts();
 
 		$this->view->BODY_HTML = $this->render($template);

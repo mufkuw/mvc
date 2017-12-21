@@ -15,6 +15,9 @@ if (!defined('DS'))
 if (!defined('ROOT'))
 	define('ROOT', realpath($_SERVER['DOCUMENT_ROOT']) . DS);
 
+if (!defined('MVC_LOGICAL_ROOT'))
+	define('MVC_LOGICAL_ROOT', '/vendor/mufkuw/mvc/src/');
+
 if (!defined('MVC_ROOT')) {
 	define('MVC_ROOT', __DIR__);
 }
@@ -24,7 +27,7 @@ if (!defined('MVC_DEFAULT_TEMPLATES')) {
 }
 
 if (!defined('MVC_DEFAULT_MEDIA')) {
-	define('MVC_DEFAULT_MEDIA', '/vendor/mufkuw/mvc/src/Media' . DS);
+	define('MVC_DEFAULT_MEDIA', MVC_ROOT . DS . 'Media' . DS);
 }
 
 if (!defined('DEBUG'))
