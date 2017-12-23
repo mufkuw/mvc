@@ -2,7 +2,11 @@
 
 namespace Mvc;
 
-class Controller extends Foundation implements IApi {
+/**
+ *
+ * @see test abc
+ */
+class Controller extends Foundation {
 
 	protected $alerts		 = [];
 	protected $view;
@@ -74,6 +78,7 @@ class Controller extends Foundation implements IApi {
 		$success = false;
 
 		foreach ($search_path as $namespace) {
+
 			$controller	 = $namespace . '\\' . ucwords($route['controller']) . "Controller";
 			$method_name = 'action' . ucwords($route['action']);
 			if (class_exists($controller, true)) {
@@ -86,10 +91,15 @@ class Controller extends Foundation implements IApi {
 				];
 				$route['params']			 = array_merge($route['params'], $_POST, $_GET);
 				$route['params']['params']	 = $route['params'];
+
 				foreach ($method_names as $method_name) {
-					print_pre([$controller, $method_name]);
 					if (method_exists($controller, $method_name)) {
-						invoke_function([$controller, $method_name], $route['params']);
+						if ($method_name === 'action') {
+							$route['params'] = $route;
+							invoke_function([$controller, $method_name], $route);
+						} else
+							invoke_function([$controller, $method_name], $route['params']);
+
 						$success = true;
 						break;
 					}

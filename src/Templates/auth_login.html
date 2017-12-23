@@ -7,7 +7,7 @@
 					<div class="panel-title">Please enter your login details.</div>
 				</div>
 				<div class="panel-body panel-primary">
-					<form action="/auth/x/login" method="post" submit-type='ajax'>
+					<form action="/api/auth/login" method="post" submit-type='ajax' referer="{$referer|null:'/'}">
 						<div class="form-group">
 							<label for="username">Email address</label>
 							<div class="input-group">

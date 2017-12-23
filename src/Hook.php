@@ -4,6 +4,28 @@ namespace Mvc;
 
 use ReflectionFunction;
 
+/**
+ * Implements Hooks system for MVC<BR>
+ * Example of registering a hook Hook::register('name.of.the.hook',function($named_parameters_of_the_hook){});<br>
+ * Register to <b>hook.execution</b> and <b>hook.registration<b><br>
+ * to debug and list the events that executes and can be hooked on
+ * <ul>
+ * <li><b>hook.execution</b> parameters :
+ * <ul>
+ * <li><b>pCallerEvent</b>		- the name of the event which is called</li>
+ * <li><b>pCaller</b>			- caller calling this event </li>
+ * <li><b>pParams</b>			- Parameters passed in this events </li>
+ * <li><b>pRegisteredEvents</b> - Event registration list</li>
+ * </ul>
+ * </li>
+ * <li><b>hook.registration</b> parameters :
+ * <ul>
+ * <li><b>pRegistrationEvent</b>		- the name of the event which is registered</li>
+ * <li><b>pRegistrant</b>				- the class or function registering to this event </li>
+ * </ul>
+ * </li>
+ * </ul>
+ */
 class Hook {
 
 	/**
@@ -18,8 +40,8 @@ class Hook {
 	private static $hook_register = array();
 
 	public static function register($event, $callback) {
-		$registrant = self::getRegistrant($callback);
-		$registrant_ref = self::getRegistrantRef($callback);
+		$registrant		 = self::getRegistrant($callback);
+		$registrant_ref	 = self::getRegistrantRef($callback);
 
 		if ($event != 'hook.registration' && $event != 'hook.execution')
 			self::execute("hook.registration", ['pRegistrationEvent' => $event, 'pRegistrant' => $registrant]);
@@ -63,19 +85,20 @@ class Hook {
 		//params passing to event args
 		//callback takes in two parameters success, results
 
-		$caller = "";
-		$event_params = ""; {
-			$trace = debug_backtrace();
-			$caller = $trace[1];
+		$caller			 = "";
+		$event_params	 = "";
+		{
+			$trace			 = debug_backtrace();
+			$caller			 = $trace[1];
 			if ($params)
-				$event_params = implode(array_keys($params), ',');
-			$caller = str_replace(realpath(ROOT), '', isset($caller['class']) ? $caller['file'] . ' - ' . $caller['class'] . '::' . $caller['function'] . '()' : $caller['file'] . ' - ' . $caller['function'] . '()');
+				$event_params	 = implode(array_keys($params), ',');
+			$caller			 = str_replace(realpath(ROOT), '', isset($caller['class']) ? $caller['file'] . ' - ' . $caller['class'] . '::' . $caller['function'] . '()' : $caller['file'] . ' - ' . $caller['function'] . '()');
 		}
 
-		$hook_register = self::$hook_register;
-		$hook_results = [];
-		$success = true;
-		$hooksplits = explode('.', $event);
+		$hook_register	 = self::$hook_register;
+		$hook_results	 = [];
+		$success		 = true;
+		$hooksplits		 = explode('.', $event);
 
 		$current_event = $event;
 
@@ -89,13 +112,13 @@ class Hook {
 			foreach ($hook_register[$current_event] as $hook) {
 				$callback = $hook['callback'];
 				if (is_callable($callback, true)) {
-					$r = null;
-					$e = null;
+					$r	 = null;
+					$e	 = null;
 					try {
-						$params['pEvent'] = $event;
-						$r = invoke_function($callback, $params);
+						$params['pEvent']	 = $event;
+						$r					 = invoke_function($callback, $params);
 					} catch (Exception $exception) {
-						$e = $exception->getMessage();
+						$e		 = $exception->getMessage();
 						$success = false;
 					}
 

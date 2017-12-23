@@ -9,7 +9,7 @@ function page_alerts($alerts, $selector)
 {
 	if (!$selector)
 		$selector = '#page_alerts';
-	alerts = '';
+	var alerts = '';
 	if ($alerts !== undefined) {
 		for (var i = 0; i < $alerts.length; i++) {
 			alerts += $('#alert_template')

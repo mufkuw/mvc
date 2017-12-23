@@ -28,15 +28,15 @@ function utf8_encode_deep(&$input) {
 }
 
 function raw_json_encode($input, $flags = 0) {
-	$fails = implode('|', array_filter(array(
+	$fails		 = implode('|', array_filter(array(
 		'\\\\',
 		$flags & JSON_HEX_TAG ? 'u003[CE]' : '',
 		$flags & JSON_HEX_AMP ? 'u0026' : '',
 		$flags & JSON_HEX_APOS ? 'u0027' : '',
 		$flags & JSON_HEX_QUOT ? 'u0022' : '',
 	)));
-	$pattern = "/\\\\(?:(?:$fails)(*SKIP)(*FAIL)|u([0-9a-fA-F]{4}))/";
-	$callback = function ($m) {
+	$pattern	 = "/\\\\(?:(?:$fails)(*SKIP)(*FAIL)|u([0-9a-fA-F]{4}))/";
+	$callback	 = function ($m) {
 		return html_entity_decode("&#x$m[1];", ENT_QUOTES, 'UTF-8');
 	};
 	return preg_replace_callback($pattern, $callback, json_encode($input, $flags));
@@ -46,14 +46,14 @@ function rdir($dir, $include_dir = false) {
 	$results = array();
 	if (!realpath($dir))
 		return $results;
-	$files = scandir($dir);
+	$files	 = scandir($dir);
 	foreach ($files as $key => $value) {
 		$path = realpath($dir . DIRECTORY_SEPARATOR . $value);
 		if (!($value == '.' || $value == '..')) {
 			if (!is_dir($path) || $include_dir)
-				$results[] = ['dir' => realpath($dir), 'name' => $value];
+				$results[]	 = ['dir' => realpath($dir), 'name' => $value];
 			if (is_dir($path))
-				$results = array_merge($results, rdir($path));
+				$results	 = array_merge($results, rdir($path));
 		}
 	}
 	return $results;
@@ -86,9 +86,9 @@ function camel_from_split($string, $delimiter = '_') {
 
 		if ($i + 1 == count($splits)) {
 			if (strlen($splits[$i]) == 2)
-				$string .= strtoupper($splits[$i]);
+				$string	 .= strtoupper($splits[$i]);
 			else
-				$string .= ucwords($splits[$i]);
+				$string	 .= ucwords($splits[$i]);
 		}
 	}
 
@@ -100,20 +100,20 @@ function print_table($data, $return = false) {
 		$s = "<table cellspacing='0px' cellpadding='10px' >";
 
 		$columns = array_keys($data[0]);
-		$rows = array_values($data);
-		$s .= '<tr>';
+		$rows	 = array_values($data);
+		$s		 .= '<tr>';
 		foreach ($columns as $column)
-			$s .= "<td>$column</td>";
+			$s		 .= "<td>$column</td>";
 
 
 		$s .= '</tr>';
 
 
 		foreach ($rows as $row) {
-			$s .= '<tr>';
+			$s	 .= '<tr>';
 			foreach ($row as $col)
-				$s .= "<td>$col</td>";
-			$s .= '</tr>';
+				$s	 .= "<td>$col</td>";
+			$s	 .= '</tr>';
 		}
 
 		return print_pre($s, $return);
@@ -160,8 +160,8 @@ class StopWatch {
 	}
 
 	public static function elapsedSpan($timerName = 'default') {
-		$r = self::elapsed($timerName);
-		self::$startTimes[$timerName] = microtime(true);
+		$r								 = self::elapsed($timerName);
+		self::$startTimes[$timerName]	 = microtime(true);
 		return number_format($r * 1000, 0) . 'ms';
 	}
 
@@ -177,19 +177,19 @@ function isenglish($string) {
 }
 
 function file_get_php_classes($filepath) {
-	$php_code = file_get_contents($filepath);
-	$classes = get_php_classes($php_code);
+	$php_code	 = file_get_contents($filepath);
+	$classes	 = get_php_classes($php_code);
 	return $classes;
 }
 
 function get_php_classes($php_code) {
 	$classes = array();
-	$tokens = token_get_all($php_code);
-	$count = count($tokens);
+	$tokens	 = token_get_all($php_code);
+	$count	 = count($tokens);
 	for ($i = 2; $i < $count; $i++) {
 		if ($tokens[$i - 2][0] == T_CLASS && $tokens[$i - 1][0] == T_WHITESPACE && $tokens[$i][0] == T_STRING) {
-			$class_name = $tokens[$i][1];
-			$classes[] = $class_name;
+			$class_name	 = $tokens[$i][1];
+			$classes[]	 = $class_name;
 		}
 	}
 	return $classes;
@@ -205,8 +205,8 @@ function convert_numbers_units($str) {
 		if (is_numeric($matches[0][0])) {
 			$ret['value'] = $matches[0][0];
 		} else {
-			$ret['unit'] = $matches[0][0];
-			$ret['value'] = 0;
+			$ret['unit']	 = $matches[0][0];
+			$ret['value']	 = 0;
 		}
 
 		if (isset($matches[0][1])) {
@@ -237,11 +237,11 @@ function condition_and($variable, ...$values) {
 }
 
 function invoke_function($pCallable, $pArgs = null) {
-	$params = [];
+	$params	 = [];
 	if (is_array($pCallable))
-		$params = (new \ReflectionMethod($pCallable[0], $pCallable[1]))->getParameters();
+		$params	 = (new \ReflectionMethod($pCallable[0], $pCallable[1]))->getParameters();
 	else if (is_a($pCallable, 'Closure'))
-		$params = (new \ReflectionFunction($pCallable))->getParameters();
+		$params	 = (new \ReflectionFunction($pCallable))->getParameters();
 
 	$receiving_array = [];
 
@@ -253,6 +253,8 @@ function invoke_function($pCallable, $pArgs = null) {
 	foreach ($pArgs as $key => $arg)
 		if (!array_key_exists($key, $receiving_array))
 			$receiving_array[$key] = &$arg;
+
+	$receiving_array['pArgs'] = $pArgs;
 
 	return call_user_func_array($pCallable, $receiving_array);
 }
