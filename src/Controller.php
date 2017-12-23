@@ -2,42 +2,40 @@
 
 namespace Mvc;
 
-class Controller extends Foundation {
+class Controller extends Foundation implements IApi {
 
-	protected $alerts = [];
+	protected $alerts		 = [];
 	protected $view;
 	protected $theme;
 	protected $route;
 	protected $cookie;
 	private static $rendered = [];
 	protected $media;
-	protected $breadcrumbs = [];
+	protected $breadcrumbs	 = [];
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->view = SmartyView::instance();
-		$this->theme = Theme::instance();
-		Context::instance()->controller = $this;
-		$this->cookies = Context::instance()->cookie;
-		$this->route = Router::getRoute();
-		$this->view->page_title = ucwords($this->route['controller'] . " " . $this->route['action']);
-		$this->media = new Media('Layout');
+		$this->view						 = SmartyView::instance();
+		$this->theme					 = Theme::instance();
+		Context::instance()->controller	 = $this;
+		$this->cookies					 = Context::instance()->cookie;
+		$this->route					 = Router::getRoute();
+		$this->view->page_title			 = ucwords($this->route['controller'] . " " . $this->route['action']);
+		$this->media					 = new Media('Layout');
 
-		Hook::register('setting.media.layout', function($pMedia) {
-			$pMedia->addCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", false);
-			$pMedia->addCss("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", false);
-			$pMedia->addJs("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js", false);
-			$pMedia->addJs("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", false);
-		});
+		$this->media->addCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", false);
+		$this->media->addCss("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", false);
+		$this->media->addJs("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js", false);
+		$this->media->addJs("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", false);
 	}
 
-//ajax actions function starts with ajax
+	//ajax actions function starts with ajax
 	public function actionX($id, $params, $c) {
 
 		$invalidAjax = !isset($c);  // if c is not passed as querystring param c=test
 		$invalidAjax = $invalidAjax && !isset($params['action_id']);  //if ajax is not passed as url path /x/test
-		$invalidAjax = $invalidAjax || (isset($params['action_id']) && !($c = $params['action_id']));   //assign $c if valid ajax.
+		$invalidAjax = $invalidAjax || (isset($params['action_id']) && !($c			 = $params['action_id']));   //assign $c if valid ajax.
 		$invalidAjax = (!$invalidAjax && method_exists($this, 'ajax' . camel_from_split('_', ucwords($c), '_'))) || $invalidAjax;  //check medthod defined if valid ajax.
 
 
@@ -47,8 +45,8 @@ class Controller extends Foundation {
 			print_pre('Invalid Ajax');
 			die(0);
 		}
-		$params['params'] = $params;
-		$output = invoke_function([$this, 'ajax' . ucwords($c)], $params);
+		$params['params']	 = $params;
+		$output				 = invoke_function([$this, 'ajax' . ucwords($c)], $params);
 
 		header('Alerts : ' . json_encode($this->alerts));
 
@@ -57,9 +55,9 @@ class Controller extends Foundation {
 
 	public function alert($type = 'info', $title = 'Info', $message = '') {
 		$this->alerts[] = [
-			'type' => $type,
-			'title' => $title,
-			'message' => $message,
+			'type'		 => $type,
+			'title'		 => $title,
+			'message'	 => $message,
 		];
 	}
 
@@ -76,18 +74,20 @@ class Controller extends Foundation {
 		$success = false;
 
 		foreach ($search_path as $namespace) {
-			$controller = $namespace . '\\' . ucwords($route['controller']) . "Controller";
+			$controller	 = $namespace . '\\' . ucwords($route['controller']) . "Controller";
 			$method_name = 'action' . ucwords($route['action']);
 			if (class_exists($controller, true)) {
 				$controller = new $controller;
 
-				$method_names = [
+				$method_names				 = [
 					'action' . ucwords(strtolower($route['params']['request_method'])) . ucwords($route['action']),
 					'action' . ucwords($route['action']),
+					'action'
 				];
-				$route['params'] = array_merge($route['params'], $_POST, $_GET);
-				$route['params']['params'] = $route['params'];
+				$route['params']			 = array_merge($route['params'], $_POST, $_GET);
+				$route['params']['params']	 = $route['params'];
 				foreach ($method_names as $method_name) {
+					print_pre([$controller, $method_name]);
 					if (method_exists($controller, $method_name)) {
 						invoke_function([$controller, $method_name], $route['params']);
 						$success = true;
@@ -139,13 +139,13 @@ class Controller extends Foundation {
 				}
 			} else {
 
-				$action = $this->getCurrentAction();
-				$controller = $this->getCurrentController();
+				$action		 = $this->getCurrentAction();
+				$controller	 = $this->getCurrentController();
 
 				if ($action != 'index' && $action != '')
-					$action = '_' . $action;
+					$action	 = '_' . $action;
 				else
-					$action = '';
+					$action	 = '';
 
 				$template = $controller . $action;
 
@@ -183,15 +183,11 @@ class Controller extends Foundation {
 
 		$layout = 'layout';
 
-		$this->media->addJs('bootstrap_layout');
-		$this->media->addCss('bootstrap_layout');
-
-
 		$this->view->HEADER_HTML = $this->header();
 		$this->view->FOOTER_HTML = $this->footer();
 
-		$this->media->addJs('bootstrap_alerts');
-		$this->media->addCss('bootstrap_alerts');
+		$this->media->addJs('alerts_bootstrap');
+		$this->media->addCss('alerts_bootstrap');
 
 		$this->view->ALERTS = $this->renderAlerts();
 
@@ -201,8 +197,8 @@ class Controller extends Foundation {
 
 		self::$rendered['layout'] = 'layout';
 
-		$this->view->JS_FILES = $this->media->renderJs();
-		$this->view->CSS_FILES = $this->media->renderCss();
+		$this->view->JS_FILES	 = $this->media->renderJs();
+		$this->view->CSS_FILES	 = $this->media->renderCss();
 
 		$output = $this->render($layout);
 

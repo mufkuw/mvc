@@ -7,7 +7,7 @@
 					<div class="panel-title">Please enter your login details.</div>
 				</div>
 				<div class="panel-body panel-primary">
-					<form action="" method="post">
+					<form action="/auth/x/login" method="post" submit-type='ajax'>
 						<div class="form-group">
 							<label for="username">Email address</label>
 							<div class="input-group">
@@ -37,7 +37,7 @@
 					</div>
 				</div>
 			</div>
-			{$ALERTS}
+			<div id='page_alerts'>{$ALERTS}</div>
 		</div>
 	</div>
 </div>

@@ -44,8 +44,7 @@ class Media extends Foundation {
 				$this->media_files[$type] = array_unique($this->media_files[$type]);
 			}
 
-			print_pre($this->media_files);
-
+			//print_pre($this->media_files);
 
 			return true;
 		}

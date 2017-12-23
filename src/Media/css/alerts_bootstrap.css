@@ -11,7 +11,8 @@
     border-left: solid 3px;
 }
 
-.alert.alert-warning:before
+.alert.alert-error:before
+,.alert.alert-warning:before
 ,.alert.alert-danger:before
 ,.alert.alert-success:before
 ,.alert.alert-info:before
@@ -56,14 +57,15 @@
 	content: "";
 }
 
-
-.alert.alert-danger
+.alert.alert-error
+,.alert.alert-danger
 {
     background-color: #FFE2E4;
     border-color: #E08F95;
     color: #D27C82;
 }
-.alert.alert-danger:before
+.alert.alert-error:before
+,.alert.alert-danger:before
 {
 	content: "";
 }

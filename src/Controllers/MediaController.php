@@ -27,7 +27,7 @@ class MediaController extends Controller {
 
 	public function actionCss($action_id) {
 		$media = Media::instance();
-		$file = $media->getJs($action_id);
+		$file = $media->getCss($action_id);
 		$content = file_get_contents($file);
 		if ($file) {
 			header('content-type: text/css');

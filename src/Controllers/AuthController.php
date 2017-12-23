@@ -18,19 +18,23 @@ class AuthController extends Controller {
 	 */
 
 	public function actionLogin($params, $username, $password, $remember_login) {
-		if ($params['request_method'] == 'GET') {
-			$this->viewLayout('login');
-		} else {
-			$is_login = Hook::execute('auth.login', $params, function($sucess, $hook_results) {
-						return $hook_results[0]['result'];
-					});
+		Hook::register("setting.media.layout", function($pMedia) {
+			$pMedia->addJs('ajax_forms');
+		});
+		$this->viewLayout();
+	}
 
-			if ($is_login) {
-				/* success fully loged in in */
-			} else {
-				$this->alert('error', 'Invaid username or password');
-				$this->viewLayout('login');
-			}
+	public function ajaxLogin($params) {
+		$login_hook_result = Hook::execute('auth.login', $params, function($sucess, $hook_results) {
+
+				});
+
+
+
+		if ($login_hook_result) {
+			/* success fully loged in in */
+		} else {
+			$this->alert('error', 'Error', "Invalid username or password");
 		}
 	}
 
