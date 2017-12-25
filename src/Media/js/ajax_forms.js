@@ -4,7 +4,7 @@ $(function () {
 		$referer = $(this).attr('referer');
 		$.ajax({
 			url: $(this).attr('action'),
-			data: $('FORM.form-product').serialize(),
+			data: $(this).serialize(),
 			type: $(this).attr('method'),
 			dataType: 'json',
 			success: function (d, s, x) {

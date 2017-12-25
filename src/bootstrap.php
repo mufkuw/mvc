@@ -44,21 +44,21 @@ register_shutdown_function(function() {
 set_error_handler(function($errno, $errstr, $errfile, $errline, $class) {
 
 	$error_names = [
-		E_ERROR => 'E_ERROR'
-		, E_WARNING => 'E_WARNING'
-		, E_PARSE => 'E_PARSE'
-		, E_NOTICE => 'E_NOTICE'
-		, E_CORE_ERROR => 'E_CORE_ERROR'
-		, E_CORE_WARNING => 'E_CORE_WARNING'
-		, E_COMPILE_ERROR => 'E_COMPILE_ERROR'
-		, E_COMPILE_WARNING => 'E_COMPILE_WARNING'
-		, E_USER_ERROR => 'E_USER_ERROR'
-		, E_USER_WARNING => 'E_USER_WARNING'
-		, E_USER_NOTICE => 'E_USER_NOTICE'
-		, E_STRICT => 'E_STRICT'
-		, E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR'
-		, E_DEPRECATED => 'E_DEPRECATED'
-		, E_USER_DEPRECATED => 'E_USER_DEPRECATED'
+		E_ERROR				 => 'E_ERROR'
+		, E_WARNING			 => 'E_WARNING'
+		, E_PARSE				 => 'E_PARSE'
+		, E_NOTICE			 => 'E_NOTICE'
+		, E_CORE_ERROR		 => 'E_CORE_ERROR'
+		, E_CORE_WARNING		 => 'E_CORE_WARNING'
+		, E_COMPILE_ERROR		 => 'E_COMPILE_ERROR'
+		, E_COMPILE_WARNING	 => 'E_COMPILE_WARNING'
+		, E_USER_ERROR		 => 'E_USER_ERROR'
+		, E_USER_WARNING		 => 'E_USER_WARNING'
+		, E_USER_NOTICE		 => 'E_USER_NOTICE'
+		, E_STRICT			 => 'E_STRICT'
+		, E_RECOVERABLE_ERROR	 => 'E_RECOVERABLE_ERROR'
+		, E_DEPRECATED		 => 'E_DEPRECATED'
+		, E_USER_DEPRECATED	 => 'E_USER_DEPRECATED'
 	];
 
 
@@ -105,13 +105,13 @@ require 'config_tools.php';
 function mvc_init($pSetup = []) {
 
 	$default_setup = [
-		'namespace' => 'App',
-		'cache_path' => 'cache',
-		'controllers_path' => 'controllers',
-		'themes_path' => 'themes',
-		'modules_path' => 'modules',
-		'default_theme' => 'default',
-		'auto_route' => 1
+		'namespace'			 => 'App',
+		'cache_path'		 => 'cache',
+		'controllers_path'	 => 'controllers',
+		'themes_path'		 => 'themes',
+		'modules_path'		 => 'modules',
+		'default_theme'		 => 'default',
+		'auto_route'		 => 1
 	];
 
 	$pSetup = array_merge($default_setup, $pSetup);
@@ -140,13 +140,13 @@ function mvc_init($pSetup = []) {
 	}
 
 
-	Context::instance()->setup = $pSetup;
-	Context::instance()->route = Router::getRoute();
+	Context::instance()->setup	 = $pSetup;
+	Context::instance()->route	 = Router::getRoute();
 
 	if (isset($pSetup['cookie_name'])) {
-		Context::instance()->cookie = new Cookie($pSetup['cookie_name']);
+		Context::instance()->cookie = Cookie::instance($pSetup['cookie_name']);
 	} else {
-		Context::instance()->cookie = new Cookie($pSetup['namespace']);
+		Context::instance()->cookie = Cookie::instance();
 	}
 
 	Context::instance()->theme = Theme::instance();

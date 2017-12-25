@@ -235,12 +235,42 @@ class Controller extends Foundation {
 		return $this->route['controller'];
 	}
 
+	public function getCurrentTemplate() {
+		return str_replace('_index', '', $this->getCurrentController() . '_' . $this->getCurrentAction());
+	}
+
 	public function header() {
 
 	}
 
 	public function footer() {
 
+	}
+
+	/**
+	 * Authenticate user access at this point of execution
+	 * @param string $access_code user access code set for users ex: 'CUSTOMER.LIST','CUSTOMER.ADD','CUSTOMER.UPDATE','CUSTOMER.REMOVE','CUSTOMER.VIEW'
+	 * @param string $area area to be authenticate for access like member, customer, admin, vendor etc
+	 *
+	 */
+	public function authenticate($access_code = null, $area = 'admin') {
+
+		$referer = $_SERVER['REQUEST_URI'];
+
+		if (!isset(Cookie::instance()->auth[$area])) {
+			Auth::login($referer, $area);
+		}
+	}
+
+	/**
+	 * Logout  from authenticated area
+	 * @param string $area area to be authenticate for access like member, customer, admin, vendor etc
+	 *
+	 */
+	public function logout($area = 'admin') {
+		if (isset(Cookie::instance()->auth[$area])) {
+			Auth::logout($area);
+		}
 	}
 
 }

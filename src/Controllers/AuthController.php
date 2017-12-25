@@ -17,21 +17,56 @@ use Mvc\Cookie;
 
 class AuthController extends Controller {
 
-	public function actionLogin($referer) {
+	/**
+	 *
+	 * @param type $referer where to redirect after login
+	 * @param type $area login to the which area ex members area, vendors area, admins area, customers area
+	 *
+	 */
+	public function actionLogin($referer, $area) {
+
 		Hook::register("setting.media.layout", function($pMedia) {
 			$pMedia->addJs('ajax_forms');
 		});
-		$system_referer		 = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : FALSE;
-		$referer			 = isset($referer) && $referer != '' ? $referer : false;
-		$this->view->referer = $referer ? $referer : $system_referer ? $system_referer : null;
-		$this->viewLayout();
+
+		$system_area	 = Cookie::instance()->area;
+		$system_referer	 = Cookie::instance()->referer;
+		$referer		 = isset($referer) && $referer != '' ? $referer : false;
+		$area			 = isset($area) && $area != '' ? $area : false;
+
+
+		$this->view->referer = $referer ? $referer : ($system_referer ? $system_referer : null);
+		$this->view->area	 = $area ? $area : ($system_area ? $system_area : null);
+
+		if (!$this->view->area) {
+			throw new InvalidAuthenicationAreaException();
+			die_error(0);
+		}
+
+		$area_template = $this->getCurrentTemplate() . ($this->view->area ? '_' . $this->view->area : '');
+
+		$this->viewLayout($area_template);
 	}
 
 	public function ajaxLogin($params) {
-		$login_hook_result = Hook::execute('auth.login', $params, function($sucess, $hook_results) {
-					if (!$hook_results[0]['result']['error']) {
-						Cookie::instance()->auth	 = true;
-						Cookie::instance()->token	 = $hook_results[0]['result']['token'];
+
+		$login_hook_result = Hook::execute('auth.login', $params, function($sucess, $hook_results) use ($params) {
+					$form = $params['params'];
+					if (!isset($hook_results[0]['result']['error'])) {
+						unset(Cookie::instance()->referer);
+						unset(Cookie::instance()->area);
+						$auth	 = Cookie::instance()->auth;
+						if (!$auth)
+							$auth	 = [];
+
+						$auth[$form['area']] = [
+							'token'		 => $hook_results[0]['result']['token'],
+							'user_name'	 => $hook_results[0]['result']['user_name'],
+							'user_id'	 => $hook_results[0]['result']['user_id']
+						];
+
+						Cookie::instance()->auth = $auth;
+
 						return true;
 					} else {
 						return false;
@@ -44,5 +79,9 @@ class AuthController extends Controller {
 			$this->alert('error', 'Error', "Invalid username or password");
 		}
 	}
+
+}
+
+class InvalidAuthenicationAreaException extends \Exception {
 
 }

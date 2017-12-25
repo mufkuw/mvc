@@ -8,16 +8,20 @@ define('COOKIE_IV', 'km=7uRt4');
 
 class Cookie {
 
-	private $data = array();
+	private $data		 = array();
 	private $cookie_name = '';
-	private $password = '&N&6C[q%';
+	private $password	 = '&N&6C[q%';
 	private static $blowfish;
 	private static $instance;
 
 	public function __construct($cookie_name) {
-		$this->cookie_name = $cookie_name;
-		self::$blowfish = new BlowFish(COOKIE_KEY, COOKIE_IV);
+		$this->cookie_name	 = $cookie_name;
+		self::$blowfish		 = new BlowFish(COOKIE_KEY, COOKIE_IV);
 		$this->load($this->cookie_name);
+	}
+
+	public function __destruct() {
+		$this->save($this->cookie_name);
 	}
 
 	public function set($prop, $value) {
@@ -30,14 +34,21 @@ class Cookie {
 
 	public function __set($prop, $value) {
 		$this->data[$prop] = $value;
-		$this->save($this->cookie_name);
 	}
 
 	public function __get($prop) {
 		if (array_key_exists($prop, $this->data)) {
 			return $this->data[$prop];
 		} else
-			return '';
+			return null;
+	}
+
+	public function __unset($prop) {
+		unset($this->data[$prop]);
+	}
+
+	public function __isset($prop) {
+		return isset($this->data[$prop]);
 	}
 
 	private function save($cookie_name) {
@@ -49,7 +60,13 @@ class Cookie {
 		}
 
 		foreach ($this->data as $key => $value) {
-			$cookie .= $key . '|' . $value . '�';
+			$cookie_value	 = '';
+			if (is_array($value))
+				$cookie_value	 = json_encode($value);
+			else
+				$cookie_value	 = $value;
+
+			$cookie .= $key . '|' . $cookie_value . '�';
 		}
 
 		$cookie .= 'checksum|' . crc32(COOKIE_PASS . $cookie);
@@ -57,26 +74,28 @@ class Cookie {
 
 		if ($cookie) {
 			$content = self::$blowfish->encrypt($cookie);
-			$time = time() + 1728000;
+			$time	 = time() + 1728000;
 		} else {
 			$content = 0;
-			$time = 1;
+			$time	 = 1;
 		}
 
-		return setcookie($cookie_name, $content, $time);
+		return setcookie($cookie_name, $content, $time, '/');
 	}
 
 	private function load($cookie_name) {
+
 		if (isset($_COOKIE[$this->cookie_name])) {
 			/* Decrypt cookie content */
 			$content = self::$blowfish->decrypt($_COOKIE[$this->cookie_name]);
+
 			//printf("\$content = %s<br />", $content);
 
 			/* Get cookie checksum */
-			$tmpTab = explode('�', $content);
+			$tmpTab					 = explode('�', $content);
 			array_pop($tmpTab);
-			$content_for_checksum = implode('�', $tmpTab) . '�';
-			$checksum = crc32($this->password . $content_for_checksum);
+			$content_for_checksum	 = implode('�', $tmpTab) . '�';
+			$checksum				 = crc32($this->password . $content_for_checksum);
 			//printf("\$checksum = %s<br />", $checksum);
 
 			/* Unserialize cookie content */
@@ -84,7 +103,10 @@ class Cookie {
 			foreach ($tmpTab as $keyAndValue) {
 				$tmpTab2 = explode('|', $keyAndValue);
 				if (count($tmpTab2) == 2) {
-					$this->data[$tmpTab2[0]] = $tmpTab2[1];
+					if (is_json($tmpTab2[1]))
+						$this->data[$tmpTab2[0]] = json_decode($tmpTab2[1], true);
+					else
+						$this->data[$tmpTab2[0]] = $tmpTab2[1];
 				}
 			}
 			/* Blowfish fix */
@@ -107,9 +129,16 @@ class Cookie {
 		}
 	}
 
-	public static function instance() {
+	public function debug() {
+		print_pre($this->data);
+	}
+
+	public static function instance($cookie_name = null) {
+		if (!$cookie_name) {
+			!$cookie_name = 'KyHc?Pe@?WE';
+		}
 		if (!self::$instance)
-			self::$instance = new Cookie('KyHc?Pe@?WE');
+			self::$instance = new Cookie($cookie_name);
 
 		return self::$instance;
 	}

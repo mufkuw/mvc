@@ -264,6 +264,11 @@ function die_page_not_found() {
 	die();
 }
 
+function die_error() {
+	header($_SERVER["SERVER_PROTOCOL"] . " 500 Error", true, 500);
+	die();
+}
+
 /*
  * Translator Provider
  */

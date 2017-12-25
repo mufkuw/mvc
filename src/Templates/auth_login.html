@@ -8,6 +8,7 @@
 				</div>
 				<div class="panel-body panel-primary">
 					<form action="/api/auth/login" method="post" submit-type='ajax' referer="{$referer|null:'/'}">
+						{hidden area=$area|null:''}
 						<div class="form-group">
 							<label for="username">Email address</label>
 							<div class="input-group">
@@ -21,7 +22,7 @@
 								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 								<input type="password" id="password" name="password" class="form-control" placeholder="Enter password">
 							</div>
-							<span class="help-block"><a href="http://opencart.localhost/admin/index.php?route=common/forgotten">Forgotten Password</a></span>
+							<span class="help-block"><a href="">Forgotten Password</a></span>
 						</div>
 						<div class="checkbox">
 							<label><input type="checkbox" name="remember_login">Remember me</label>
