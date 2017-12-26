@@ -269,10 +269,11 @@ function die_error() {
 	die();
 }
 
-/*
- * Translator Provider
+/**
+ * Translation provider...
+ * @param type $string
+ * @return string
  */
-
 function l($string) {
 	return $string;
 }

@@ -45,10 +45,18 @@ class AuthController extends Controller {
 
 		$area_template = $this->getCurrentTemplate() . ($this->view->area ? '_' . $this->view->area : '');
 
-		$this->viewLayout($area_template);
+		$this->viewLayout(); //$area_template);
 	}
 
 	public function ajaxLogin($params) {
+
+		try {
+			Hook::eventRequired('auth.login', ['username', 'password', 'remember_login', 'area'], ['token', 'user_name', 'user_id']);
+		} catch (Exception $exc) {
+			$this->alert('error', 'Error', $exc->getMessage());
+		}
+
+
 
 		$login_hook_result = Hook::execute('auth.login', $params, function($sucess, $hook_results) use ($params) {
 					$form = $params['params'];

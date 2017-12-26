@@ -161,4 +161,35 @@ class Hook {
 		return self::$hook_register;
 	}
 
+	public static function isEventRegistered($pEvent) {
+		if (!isset(self::$hook_register[$pEvent]) || count(self::$hook_register[$pEvent]) == 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	/**
+	 * This routine will check if the event which is executed has at least 1 handler registered or throws an exception
+	 * @param type $pEvent name of the event
+	 * @param type $pParams parameters passed
+	 * @param type $pReturn expected parameters return from the event handler
+	 * @throws RequiredEventHookNotRegisteredException
+	 */
+	public static function eventRequired($pEvent, $pParams, $pReturn) {
+		if (!isset(self::$hook_register[$pEvent]) || count(self::$hook_register[$pEvent]) == 0) {
+			throw new RequiredEventHookNotRegisteredException($pEvent, $pParams, $pReturn);
+		}
+	}
+
+}
+
+class RequiredEventHookNotRegisteredException extends \Exception {
+
+	public function __construct($event, $params, $return) {
+		$params_string	 = implode(',\$', $params);
+		$return_string	 = implode(',', $return);
+		parent::__construct("Cannot find Hook::register('$event',function($params_string ){   }); \nPlease add the above hook resister to capture $event and return array($return_string)");
+	}
+
 }
