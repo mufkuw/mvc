@@ -187,7 +187,7 @@ class Hook {
 class RequiredEventHookNotRegisteredException extends \Exception {
 
 	public function __construct($event, $params, $return) {
-		$params_string	 = implode(',\$', $params);
+		$params_string	 = implode(', $', $params);
 		$return_string	 = implode(',', $return);
 		parent::__construct("Cannot find Hook::register('$event',function($params_string ){   }); \nPlease add the above hook resister to capture $event and return array($return_string)");
 	}

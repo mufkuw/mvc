@@ -2,10 +2,6 @@
 
 namespace Mvc;
 
-/**
- *
- * @see test abc
- */
 class Controller extends Foundation {
 
 	protected $alerts		 = [];

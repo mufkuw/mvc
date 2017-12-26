@@ -52,7 +52,7 @@ class AuthController extends Controller {
 
 		try {
 			Hook::eventRequired('auth.login', ['username', 'password', 'remember_login', 'area'], ['token', 'user_name', 'user_id']);
-		} catch (Exception $exc) {
+		} catch (\Exception $exc) {
 			$this->alert('error', 'Error', $exc->getMessage());
 		}
 
@@ -60,7 +60,7 @@ class AuthController extends Controller {
 
 		$login_hook_result = Hook::execute('auth.login', $params, function($sucess, $hook_results) use ($params) {
 					$form = $params['params'];
-					if (!isset($hook_results[0]['result']['error'])) {
+					if (isset($hook_results[0]) && !isset($hook_results[0]['result']['error'])) {
 						unset(Cookie::instance()->referer);
 						unset(Cookie::instance()->area);
 						$auth	 = Cookie::instance()->auth;
