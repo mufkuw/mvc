@@ -2,6 +2,8 @@
 
 namespace Mvc;
 
+use Mvc\Controllers\AuthController;
+
 abstract class Controller extends Foundation {
 
 	protected $alerts		 = [];
@@ -9,6 +11,7 @@ abstract class Controller extends Foundation {
 	protected $theme;
 	protected $route;
 	protected $cookie;
+	protected $layout		 = 'layout';
 	private static $rendered = [];
 	protected $media;
 	protected $breadcrumbs	 = [];
@@ -67,16 +70,10 @@ abstract class Controller extends Foundation {
 	public static function execute($route) {
 
 		//posible controllers namespace defination to purpose the search
-		$search_path = [
-			Context::instance()->setup['namespace'] . '\\Controllers', //search with App\Controllers
-			Context::instance()->setup['namespace'], // search with App\
-			'Mvc\\Controllers', //search with Mvc\Controllers
-			'' //search directly without namespace
-		];
 
-		$success = false;
-
-		foreach ($search_path as $namespace) {
+		$namespaces	 = array_merge(array("\\" . Context::instance()->setup['namespace'] . "\\Controllers"), array_reverse(Context::instance()->search_sequence_controllers_namespaces));
+		$success	 = false;
+		foreach ($namespaces as $namespace) {
 
 			$controller	 = $namespace . '\\' . ucwords($route['controller']) . "Controller";
 			//print_pre($controller);
@@ -186,15 +183,15 @@ abstract class Controller extends Foundation {
 		echo $this->render($template);
 	}
 
-	public function viewLayout($template = null) {
+	public function viewLayout($template = null, $layout = null) {
 		Cookie::instance()->save();
-		echo $this->renderLayout($template);
+		echo $this->renderLayout($template, $layout);
 	}
 
-	public function renderLayout($template = null) {
+	public function renderLayout($template = null, $layout = null) {
 		$output = '';
 
-		$layout = 'layout';
+		$layout = !$layout ? $this->layout : $layout;
 
 		$this->view->HEADER_HTML = $this->header();
 		$this->view->FOOTER_HTML = $this->footer();
@@ -290,10 +287,9 @@ abstract class Controller extends Foundation {
 	public static function getControllers($path) {
 		$files	 = [];
 		$files	 = array_merge($files, array_filter(rdir($path), function($a) {
-					print_pre($a['dir'] . DS . $a['name']);
-					return preg_match_all('/\\\\controllers\\\\(.*)Controller/', $a['dir'] . DS . $a['name']) > 0;
+					return preg_match_all('/\\\\controllers\\\\(.*)Controller\.php/', $a['dir'] . DS . $a['name']) > 0;
 				}));
-		print_pre($files);
+		return $files;
 	}
 
 }

@@ -31,25 +31,15 @@ class Theme extends Foundation {
 	}
 
 	public function getTemplate($file, $throw_exception = true) {
-		$search_paths	 = [];
-		$search_paths[]	 = $file;
-		$search_paths[]	 = $file . '.html';
+		$search_paths = [$file, $this->getCurrentThemePath() . $file, $this->getDefaultThemePath() . $file];
+		foreach (array_reverse(Context::instance()->search_sequence_templates) as $search_sequence) {
+			$search_paths[] = $search_sequence . $file;
+		}
+
+		print_pre($search_paths);
 
 		foreach ($search_paths as $path) {
-
-			$this_path			 = realpath($path);
-			$mvc_path			 = realpath(MVC_DEFAULT_TEMPLATES . $path);
-			$full_path_default	 = realpath(Context::instance()->theme->getDefaultThemePath() . $path);
-			$full_path			 = realpath(Context::instance()->theme->getCurrentThemePath() . $path);
-
-			if ($this_path && file_exists($this_path))
-				return $this_path;
-			else if ($full_path && file_exists($full_path))
-				return $full_path;
-			else if ($full_path_default && file_exists($full_path_default))
-				return $full_path_default;
-			else if ($mvc_path && file_exists($mvc_path))
-				return $mvc_path;
+			print_pre([file_exists($path . MVC_TEMPLATES_EXT), $path . MVC_TEMPLATES_EXT]);
 		}
 
 		if ($throw_exception)

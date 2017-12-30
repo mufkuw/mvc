@@ -2,9 +2,7 @@
 
 namespace Mvc;
 
-use Mvc\Controllers\AuthController;
-
-class Auth extends Foundation {
+class Auth {
 
 	public static function login($referer = null, $area = null) {
 		Cookie::instance()->referer	 = $referer;

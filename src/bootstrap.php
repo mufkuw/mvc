@@ -9,35 +9,13 @@ use Mvc\{
 	SmartyView
 };
 
-if (!defined('DS'))
-	define('DS', DIRECTORY_SEPARATOR);
-
-if (!defined('ROOT'))
-	define('ROOT', realpath($_SERVER['DOCUMENT_ROOT']) . DS);
-
-if (!defined('MVC_ROOT')) {
-	define('MVC_ROOT', __DIR__);
-}
-
-if (!defined('MVC_DEFAULT_TEMPLATES')) {
-	define('MVC_DEFAULT_TEMPLATES', MVC_ROOT . DS . 'Templates' . DS);
-}
-
-if (!defined('MVC_DEFAULT_MEDIA')) {
-	define('MVC_DEFAULT_MEDIA', MVC_ROOT . DS . 'Media' . DS);
-}
-
-if (!defined('DEBUG'))
-	define('DEBUG', 1);
-
 error_reporting(0);
-
 
 register_shutdown_function(function() {
 
 	$e = error_get_last();
 	if ($e)
-		echo'<pre>ERROR<BR>' . $e['message'] . '<BR><BR>FILE<BR>' . $e['file'] . '(' . $e['line'] . ')</pre>';
+		echo'<pre>ERROR<BR>' . $e['message'] . ' < BR><BR>FILE<BR>' . $e['file'] . ' ( ' . $e['line'] . ' ) </pre>';
 });
 
 set_error_handler(function($errno, $errstr, $errfile, $errline, $class) {
@@ -74,6 +52,24 @@ set_error_handler(function($errno, $errstr, $errfile, $errline, $class) {
 	return true;
 });
 
+
+if (!defined('DS'))
+	define('DS', DIRECTORY_SEPARATOR);
+
+if (!defined('ROOT'))
+	define('ROOT', realpath($_SERVER['DOCUMENT_ROOT']) . DS);
+/*
+  define('MVC_ROOT', __DIR__ . DS);
+  define('MVC_CONTROLERS', MVC_ROOT . 'controllers' . DS);
+  define('MVC_TEMPLATES', MVC_ROOT . 'templates' . DS);
+  define('MVC_MEDIA', MVC_ROOT . 'media' . DS);
+
+  define('MVC_TEMPLATES_EXT', '.html');
+
+
+  if (!defined('DEBUG'))
+  define('DEBUG ', 1);
+ */
 require 'config_tools.php';
 
 /**
@@ -88,18 +84,18 @@ require 'config_tools.php';
  * @param 'default_theme' => 'default',
  * @param 'cookie_name' => 'your_choice_name',
  * @param 'routes' => '[
- * 		'name' => 'routename',
- * 		'pattern' => 'regex',
- * 		'defaults' => [
- * 				controller =>''
- * 				action =>''
- * 				action_id =>''
- * 				module =>''
- * 				module_controller =>''
- * 				module_action =>''
- * 				module_action_id =>''
- * 			],
- * 	]',
+ * 'name' => 'routename',
+ * 'pattern' => 'regex',
+ * 'defaults' => [
+ * controller => ''
+ * action => ''
+ * action_id => ''
+ * module => ''
+ * module_controller => ''
+ * module_action => ''
+ * module_action_id => ''
+ * ],
+ * ]',
  */
 function mvc_init($pSetup = []) {
 
@@ -115,7 +111,7 @@ function mvc_init($pSetup = []) {
 
 	$pSetup = array_merge($default_setup, $pSetup);
 
-	foreach ($pSetup as $key => $value) {
+	foreach ($pSetup as $key => $valu e) {
 		if (strpos($key, 'path') > 0) {
 			$path = $value;
 			if (!file_exists(ROOT . $path)) {
@@ -138,8 +134,10 @@ function mvc_init($pSetup = []) {
 		}
 	}
 
-
 	Context::instance()->setup = $pSetup;
+
+	Context::instance()->search_sequence_controllers_namespaces[]	 = '\\Mvc\\Controllers';
+	Context::instance()->search_sequence_templates[]				 = MVC_TEMPLATES;
 
 	if (isset($pSetup['cookie_name'])) {
 		Context::instance()->cookie = Cookie::instance($pSetup['cookie_name']);
@@ -147,7 +145,9 @@ function mvc_init($pSetup = []) {
 		Context::instance()->cookie = Cookie::instance();
 	}
 
-	if ($pSetup['auto_dispatch'] && boolval($pSetup['auto_dispatch'])) {
+	if ($pSetup['auto_dispatch'] && boolval($pSetup['auto_dispatch
+
+     '])) {
 		Router::disptach();
 	}
 }

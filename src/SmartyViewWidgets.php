@@ -10,7 +10,7 @@ class SmartyViewWidgets extends Foundation {
 
 		$this->smarty	 = $smarty;
 		$theme			 = Theme::instance();
-		$files			 = array_merge(rdir($theme->getCurrentThemePath()), rdir(MVC_DEFAULT_TEMPLATES));
+		$files			 = array_merge(rdir($theme->getCurrentThemePath()), rdir(MVC_TEMPLATES));
 
 		$files = array_filter($files, function($item) {
 			$matches = [];

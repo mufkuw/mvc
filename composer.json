@@ -7,7 +7,7 @@
 			"email": "mufkuw@gmail.com"
 		}
 	],
-	"require": {
+	"require-dev": {
 		"smarty/smarty": "v3.1.31"
 	},
 	"autoload": {

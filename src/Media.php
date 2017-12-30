@@ -7,20 +7,20 @@ define('CSS_TEMPLATE', "<link href='{MEDIA}' rel='stylesheet' type='text/css'/>"
 
 class MediaTypes {
 
-	const JS = 'js';
-	const CSS = 'css';
+	const JS	 = 'js';
+	const CSS	 = 'css';
 
 }
 
 class Media extends Foundation {
 
 	private $media_files = [];
-	private $scope = '';
+	private $scope		 = '';
 
 	public function __construct($scope = '') {
-		$this->media_files['js'] = [];
-		$this->media_files['css'] = [];
-		$this->scope = $scope;
+		$this->media_files['js']	 = [];
+		$this->media_files['css']	 = [];
+		$this->scope				 = $scope;
 	}
 
 	private function addMedia($type, $media, $validate = true, $module = '') {
@@ -33,15 +33,15 @@ class Media extends Foundation {
 			}
 
 			if ($media != $media_path) {
-				$validate = false;
-				$media_path = "/media/$type/$media.$type";
+				$validate	 = false;
+				$media_path	 = "/media/$type/$media.$type";
 			}
 
 
 
 			if (($validate && realpath(ROOT . $media_path)) || !$validate) {
-				$this->media_files[$type][] = $media_path;
-				$this->media_files[$type] = array_unique($this->media_files[$type]);
+				$this->media_files[$type][]	 = $media_path;
+				$this->media_files[$type]	 = array_unique($this->media_files[$type]);
 			}
 
 			//print_pre($this->media_files);
@@ -60,8 +60,8 @@ class Media extends Foundation {
 
 	private function renderMedia($type) {
 		$media_template = [
-			'js' => JS_TEMPLATE
-			, 'css' => CSS_TEMPLATE
+			'js'	 => JS_TEMPLATE
+			, 'css'	 => CSS_TEMPLATE
 		];
 
 		$html = '';
@@ -91,12 +91,12 @@ class Media extends Foundation {
 			return $file;
 
 
-		$search_paths = array();
-		$search_paths[] = $file;
-		$search_paths[] = $theme->getCurrentThemePath() . '' . $type . '/' . $file;
-		$search_paths[] = $theme->getDefaultThemePath() . '' . $type . '/' . $file;
-		$search_paths[] = MVC_DEFAULT_MEDIA . '' . $type . DS . $file;
-		$search_paths[] = ROOT . Context::instance()->setup['modules_path'] . $module . DS . $type . DS . $file;
+		$search_paths	 = array();
+		$search_paths[]	 = $file;
+		$search_paths[]	 = $theme->getCurrentThemePath() . '' . $type . '/' . $file;
+		$search_paths[]	 = $theme->getDefaultThemePath() . '' . $type . '/' . $file;
+		$search_paths[]	 = MVC_MEDIA . '' . $type . DS . $file;
+		$search_paths[]	 = ROOT . Context::instance()->setup['modules_path'] . $module . DS . $type . DS . $file;
 
 		foreach ($search_paths as $path) {
 
