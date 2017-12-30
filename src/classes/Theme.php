@@ -36,10 +36,13 @@ class Theme extends Foundation {
 			$search_paths[] = $search_sequence . $file;
 		}
 
-		print_pre($search_paths);
+		//print_pre($search_paths);
 
 		foreach ($search_paths as $path) {
-			print_pre([file_exists($path . MVC_TEMPLATES_EXT), $path . MVC_TEMPLATES_EXT]);
+			if (file_exists($path . MVC_TEMPLATES_EXT))
+				return $path . MVC_TEMPLATES_EXT;
+			else if (file_exists($path))
+				return $path;
 		}
 
 		if ($throw_exception)

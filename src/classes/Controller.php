@@ -71,12 +71,17 @@ abstract class Controller extends Foundation {
 
 		//posible controllers namespace defination to purpose the search
 
-		$namespaces	 = array_merge(array("\\" . Context::instance()->setup['namespace'] . "\\Controllers"), array_reverse(Context::instance()->search_sequence_controllers_namespaces));
-		$success	 = false;
+		$namespaces = array_merge(array("\\" . Context::instance()->setup['namespace'] . "\\Controllers"), array_reverse(Context::instance()->search_sequence_controllers_namespaces));
+
+		//print_pre($namespaces);
+
+		$success = false;
 		foreach ($namespaces as $namespace) {
 
-			$controller	 = $namespace . '\\' . ucwords($route['controller']) . "Controller";
-			//print_pre($controller);
+			$controller = $namespace . '\\' . ucwords($route['controller']) . "Controller";
+
+			//print_pre([class_exists($controller), $controller]);
+
 			$method_name = 'action' . ucwords($route['action']);
 			if (class_exists($controller, true)) {
 				$controller			 = $controller::instance();

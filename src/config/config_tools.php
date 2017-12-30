@@ -327,11 +327,41 @@ function getAttributes($callable) {
 	}
 }
 
-/**
- * Translation provider...
- * @param type $string
- * @return string
- */
 function l($string) {
 	return $string;
+}
+
+function get_php_files($path) {
+	$files = array_filter(rdir($path), function($i) {
+		return preg_match_all("/.php$/", $i['dir'] . DS . $i['name']);
+	});
+	return $files;
+}
+
+function preload(...$paths) {
+	$files = [];
+	foreach ($paths as $path) {
+		array_filter(get_php_files($path), function($file) use (&$files) {
+			$files[] = $file['dir'] . DIRECTORY_SEPARATOR . $file['name'];
+			require_once $file['dir'] . DIRECTORY_SEPARATOR . $file['name'];
+		});
+	}
+	return $files;
+}
+
+function json_write($object, $file) {
+	if (file_exists($file)) {
+		unlink($file);
+	}
+	$text = json_encode($object);
+	file_put_contents($file, $text);
+}
+
+function json_read($file) {
+	if (file_exists($file)) {
+		$json	 = file_get_contents($file);
+		$data	 = json_decode($json, true);
+		return $data;
+	}
+	return null;
 }

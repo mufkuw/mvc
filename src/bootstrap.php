@@ -1,5 +1,31 @@
 <?php
 
+define('MVC_ROOT', __DIR__ . DS);
+define('MVC_CONFIG', MVC_ROOT . 'config' . DS);
+define('MVC_CONTROLLERS', MVC_ROOT . 'controllers' . DS);
+define('MVC_CLASSES', MVC_ROOT . 'classes' . DS);
+define('MVC_FOUNDATION_CLASS', MVC_CLASSES . 'Foundation.php');
+define('MVC_TEMPLATES', MVC_ROOT . 'templates' . DS);
+define('MVC_MEDIA', MVC_ROOT . 'media' . DS);
+define('MVC_TEMPLATES_EXT', '.html');
+
+require MVC_CONFIG . "startup_scripts.php";
+require_once MVC_FOUNDATION_CLASS;
+
+//preloading classes
+(function() {
+	$json_file	 = MVC_CONFIG . 'class_index.json';
+	$classes	 = json_read($json_file);
+	if (!$classes) {
+		$classes = preload(MVC_CLASSES, MVC_CONTROLLERS);
+		json_write($classes, $json_file);
+	} else {
+		foreach ($classes as $class) {
+			require_once $class;
+		}
+	}
+})();
+
 use Mvc\{
 	Context,
 	Router,
@@ -8,69 +34,6 @@ use Mvc\{
 	Theme,
 	SmartyView
 };
-
-error_reporting(0);
-
-register_shutdown_function(function() {
-
-	$e = error_get_last();
-	if ($e)
-		echo'<pre>ERROR<BR>' . $e['message'] . ' < BR><BR>FILE<BR>' . $e['file'] . ' ( ' . $e['line'] . ' ) </pre>';
-});
-
-set_error_handler(function($errno, $errstr, $errfile, $errline, $class) {
-
-	$error_names = [
-		E_ERROR				 => 'E_ERROR'
-		, E_WARNING			 => 'E_WARNING'
-		, E_PARSE				 => 'E_PARSE'
-		, E_NOTICE			 => 'E_NOTICE'
-		, E_CORE_ERROR		 => 'E_CORE_ERROR'
-		, E_CORE_WARNING		 => 'E_CORE_WARNING'
-		, E_COMPILE_ERROR		 => 'E_COMPILE_ERROR'
-		, E_COMPILE_WARNING	 => 'E_COMPILE_WARNING'
-		, E_USER_ERROR		 => 'E_USER_ERROR'
-		, E_USER_WARNING		 => 'E_USER_WARNING'
-		, E_USER_NOTICE		 => 'E_USER_NOTICE'
-		, E_STRICT			 => 'E_STRICT'
-		, E_RECOVERABLE_ERROR	 => 'E_RECOVERABLE_ERROR'
-		, E_DEPRECATED		 => 'E_DEPRECATED'
-		, E_USER_DEPRECATED	 => 'E_USER_DEPRECATED'
-	];
-
-
-
-	$ignore_errors = [];
-
-	if (!DEBUG) {
-		$ignore_errors = [E_WARNING, E_NOTICE, E_CORE_WARNING, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR, E_DEPRECATED, E_USER_DEPRECATED];
-	}
-
-	if (!in_array($errno, $ignore_errors, true))
-		echo'<pre>' . $error_names[$errno] . '<BR>' . $errstr . '<BR><BR>FILE<BR>' . $errfile . '(' . $errline . ')</pre>';
-
-	return true;
-});
-
-
-if (!defined('DS'))
-	define('DS', DIRECTORY_SEPARATOR);
-
-if (!defined('ROOT'))
-	define('ROOT', realpath($_SERVER['DOCUMENT_ROOT']) . DS);
-/*
-  define('MVC_ROOT', __DIR__ . DS);
-  define('MVC_CONTROLERS', MVC_ROOT . 'controllers' . DS);
-  define('MVC_TEMPLATES', MVC_ROOT . 'templates' . DS);
-  define('MVC_MEDIA', MVC_ROOT . 'media' . DS);
-
-  define('MVC_TEMPLATES_EXT', '.html');
-
-
-  if (!defined('DEBUG'))
-  define('DEBUG ', 1);
- */
-require 'config_tools.php';
 
 /**
  * Instantiate the MVC pattern
@@ -111,7 +74,10 @@ function mvc_init($pSetup = []) {
 
 	$pSetup = array_merge($default_setup, $pSetup);
 
-	foreach ($pSetup as $key => $valu e) {
+
+
+
+	foreach ($pSetup as $key => $value) {
 		if (strpos($key, 'path') > 0) {
 			$path = $value;
 			if (!file_exists(ROOT . $path)) {
@@ -145,9 +111,7 @@ function mvc_init($pSetup = []) {
 		Context::instance()->cookie = Cookie::instance();
 	}
 
-	if ($pSetup['auto_dispatch'] && boolval($pSetup['auto_dispatch
-
-     '])) {
+	if ($pSetup['auto_dispatch'] && boolval($pSetup['auto_dispatch'])) {
 		Router::disptach();
 	}
 }

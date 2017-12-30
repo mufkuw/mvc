@@ -7,15 +7,12 @@
 			"email": "mufkuw@gmail.com"
 		}
 	],
-	"require-dev": {
+	"require": {
 		"smarty/smarty": "v3.1.31"
 	},
 	"autoload": {
 		"files": [
 			"src/bootstrap.php"
-		],
-		"psr-4": {
-			"Mvc\\": "src/"
-		}
+		]
 	}
 }
