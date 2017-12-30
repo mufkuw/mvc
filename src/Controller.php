@@ -2,7 +2,7 @@
 
 namespace Mvc;
 
-class Controller extends Foundation {
+abstract class Controller extends Foundation {
 
 	protected $alerts		 = [];
 	protected $view;
@@ -16,9 +16,11 @@ class Controller extends Foundation {
 	public function __construct() {
 		parent::__construct();
 
+		Context::instance()->theme		 = Theme::instance();
+		Context::instance()->view		 = SmartyView::instance();
+		Context::instance()->controller	 = $this;
 		$this->view						 = SmartyView::instance();
 		$this->theme					 = Theme::instance();
-		Context::instance()->controller	 = $this;
 		$this->cookies					 = Context::instance()->cookie;
 		$this->route					 = Router::getRoute();
 		$this->view->page_title			 = ucwords($this->route['controller'] . " " . $this->route['action']);
@@ -28,6 +30,7 @@ class Controller extends Foundation {
 		$this->media->addCss("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", false);
 		$this->media->addJs("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js", false);
 		$this->media->addJs("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", false);
+		$this->media->addJs("https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js", false);
 	}
 
 	//ajax actions function starts with ajax
@@ -76,9 +79,11 @@ class Controller extends Foundation {
 		foreach ($search_path as $namespace) {
 
 			$controller	 = $namespace . '\\' . ucwords($route['controller']) . "Controller";
+			//print_pre($controller);
 			$method_name = 'action' . ucwords($route['action']);
 			if (class_exists($controller, true)) {
-				$controller = new $controller;
+				$controller			 = $controller::instance();
+				$controller->route	 = $route;
 
 				$method_names				 = [
 					'action' . ucwords(strtolower($route['params']['request_method'])) . ucwords($route['action']),
@@ -95,23 +100,16 @@ class Controller extends Foundation {
 							invoke_function([$controller, $method_name], $route);
 						} else
 							invoke_function([$controller, $method_name], $route['params']);
-
 						$success = true;
 						break;
 					}
 				}
 			}
+			if ($success)
+				break;
 		}
 		if (!$success)
 			die_page_not_found();
-	}
-
-	public function viewJson($object) {
-		header('Content-Type: application/json');
-		//utf8_encode_deep($object);
-		//echo raw_json_encode($object);
-
-		echo json_encode($object, JSON_UNESCAPED_UNICODE);
 	}
 
 	public function render($template = null) {
@@ -174,14 +172,23 @@ class Controller extends Foundation {
 			$ex = new Exception('Error loading ' . $template . ' because of ' . $e->getMessage(), 0, $e);
 			throw $ex;
 		}
-
-
-
 		return Minify::html($output);
 	}
 
+	public function viewJson($object) {
+		Cookie::instance()->save();
+		header('Content-Type: application/json');
+		echo json_encode($object, JSON_UNESCAPED_UNICODE);
+	}
+
 	public function view($template = null) {
+		Cookie::instance()->save();
 		echo $this->render($template);
+	}
+
+	public function viewLayout($template = null) {
+		Cookie::instance()->save();
+		echo $this->renderLayout($template);
 	}
 
 	public function renderLayout($template = null) {
@@ -211,10 +218,6 @@ class Controller extends Foundation {
 		return $output;
 	}
 
-	public function viewLayout($template = null) {
-		echo $this->renderLayout($template);
-	}
-
 	public function renderAlerts() {
 		$html = '';
 		foreach ($this->alerts as $alert) {
@@ -224,6 +227,7 @@ class Controller extends Foundation {
 	}
 
 	private function getCurrentAction() {
+
 		return $this->route['action'];
 	}
 
@@ -232,7 +236,21 @@ class Controller extends Foundation {
 	}
 
 	public function getCurrentTemplate() {
-		return str_replace('_index', '', $this->getCurrentController() . '_' . $this->getCurrentAction());
+
+		$trace		 = debug_backtrace_of('action');
+		$action		 = '';
+		$controller	 = '';
+
+		if ($trace) {
+			$action = strtolower(str_replace('action', '', $trace['function']));
+			if (isset($trace['class'])) {
+				$controller	 = explode('\\', $trace['class']);
+				$controller	 = array_pop($controller);
+				$controller	 = strtolower(str_replace('Controller', '', $controller));
+			}
+		}
+
+		return str_replace('_index', '', $controller . '_' . $action);
 	}
 
 	public function header() {
@@ -267,6 +285,15 @@ class Controller extends Foundation {
 		if (isset(Cookie::instance()->auth[$area])) {
 			Auth::logout($area);
 		}
+	}
+
+	public static function getControllers($path) {
+		$files	 = [];
+		$files	 = array_merge($files, array_filter(rdir($path), function($a) {
+					print_pre($a['dir'] . DS . $a['name']);
+					return preg_match_all('/\\\\controllers\\\\(.*)Controller/', $a['dir'] . DS . $a['name']) > 0;
+				}));
+		print_pre($files);
 	}
 
 }

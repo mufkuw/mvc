@@ -39,14 +39,53 @@ class Hook {
 	 * */
 	private static $hook_register = array();
 
+	/**
+	 *
+	 * @param type $event
+	 * @param type $callback
+	 * @attribute test=1;
+	 */
 	public static function register($event, $callback) {
-		$registrant		 = self::getRegistrant($callback);
-		$registrant_ref	 = self::getRegistrantRef($callback);
+		$registrant = self::getRegistrant($callback);
 
-		if ($event != 'hook.registration' && $event != 'hook.execution')
+		$registrant_ref = time();
+
+
+
+		//registrant ref
+		{
+			$backtrace = array_filter(debug_backtrace(), function($i) {
+				return isset($i['function']) && $i['function'] === 'register';
+			});
+			if (isset($backtrace[0])) {
+				$registrant_ref = str_replace(ROOT, '', $backtrace[0]['file']) . '.' . $backtrace[0]['line'];
+			}
+		}
+
+		if ($event != 'hook.registration' && $event != 'hook.execution') {
 			self::execute("hook.registration", ['pRegistrationEvent' => $event, 'pRegistrant' => $registrant]);
+		}
 
-		self::$hook_register[$event][$registrant_ref] = ['callback' => $callback, 'registrant' => $registrant];
+		$attributes	 = getAttributes($callback);
+		$sort		 = 1.0;
+		if (isset($attributes['sort'])) {
+			$sort = floatval($attributes['sort']);
+		}
+
+		$hook_id										 = isset(self::$hook_register[$event]) ? count(self::$hook_register[$event]) : 0;
+		self::$hook_register[$event][$registrant_ref]	 = ['id' => $hook_id, 'callback' => $callback, 'registrant' => $registrant, 'sort' => $sort];
+
+		return $hook_id;
+	}
+
+	public static function unregister($event, $hook_id) {
+		if (isset(self::$hook_register[$event])) {
+			foreach (self::$hook_register[$event] as $key => $value) {
+				if ($value['id'] == $hook_id) {
+					unset(self::$hook_register[$event][$key]);
+				}
+			}
+		}
 	}
 
 	public static function autoRegister($class_object) {
@@ -54,7 +93,7 @@ class Hook {
 		foreach ($methods as $method) {
 			$m = self::getHookName($method);
 			if ($m) {
-				self::register($m, [$class_object, $method]);
+				self:: register($m, [$class_object, $method]);
 			}
 		}
 	}
@@ -62,10 +101,12 @@ class Hook {
 	private static function getHookName($method) {
 		if (substr($method, 0, 4) == 'hook') {
 			$a = camel_split($method);
-			array_shift($a); //poping the first element 'hook'
+			array_shift($a); //poping the first element 'hook '
 			return strtolower(implode($a, '.'));
 		} else
-			return '';
+			return
+
+					'';
 	}
 
 	private static function getHookMethodName($event) {
@@ -88,11 +129,13 @@ class Hook {
 		$caller			 = "";
 		$event_params	 = "";
 		{
-			$trace			 = debug_backtrace();
-			$caller			 = $trace[1];
+			$trace = array_filter(debug_backtrace(), function($i) {
+				return isset($i['function']) && $i['function'] === 'execute';
+			});
+			$caller			 = $trace[0];
 			if ($params)
-				$event_params	 = implode(array_keys($params), ',');
-			$caller			 = str_replace(realpath(ROOT), '', isset($caller['class']) ? $caller['file'] . ' - ' . $caller['class'] . '::' . $caller['function'] . '()' : $caller['file'] . ' - ' . $caller['function'] . '()');
+				$event_params	 = implode(array_keys($params), ', ');
+			$caller			 = str_replace(ROOT, '', isset($caller['class']) ? $caller ['file'] . ' - ' . $caller ['class'] . '::' . $caller['function'] . '()' : $caller ['file'] . ' - ' . $caller['function'] . '()');
 		}
 
 		$hook_register	 = self::$hook_register;
@@ -109,7 +152,17 @@ class Hook {
 				self::execute('hook.execution', ['pCallerEvent' => $event, 'pCaller' => $caller, 'pParams' => $event_params, 'pRegisteredEvents' => $hook_register[$current_event]]);
 			}
 
-			foreach ($hook_register[$current_event] as $hook) {
+			$hooks = $hook_register[$current_event];
+			uasort($hooks, function($a, $b) {
+				$result = 0;
+				if (floatval($a ['sort']) > floatval($b['sort'])) {
+					$result = 1;
+				} else if (floatval($a ['sort']) < floatval($b['sort'])) {
+					$result = -1;
+				}
+				return $result;
+			});
+			foreach ($hooks as $hook) {
 				$callback = $hook['callback'];
 				if (is_callable($callback, true)) {
 					$r	 = null;
@@ -135,7 +188,7 @@ class Hook {
 		if (is_callable($callable)) {
 			//print_pre( );
 			if (is_a($callable, 'Closure')) {
-				preg_match_all('/\[this\] => (.+) Object/', print_r($callable, true), $matches);
+				preg_match_all('/\[this\] =>(.+)   Object/', print_r($callable, true), $matches);
 				if ($matches[1])
 					return $matches[1][0];
 			}
@@ -147,7 +200,9 @@ class Hook {
 
 	private static function getRegistrantRef($callable) {
 		if (is_callable($callable)) {
-			if (is_a($callable, 'Closure')) {
+			if (is_a($callable, 'Closure
+
+		')) {
 				$r = new ReflectionFunction($callable);
 				return strtolower(str_replace('\\', '.', str_replace(realpath(ROOT), '', $r->getFileName()))) . '.' . $r->getEndLine();
 			} else if (is_array($callable) && count($callable) > 0 && is_object($callable[0])) {
@@ -158,7 +213,9 @@ class Hook {
 	}
 
 	public static function getHookRegister() {
-		return self::$hook_register;
+		return self::
+
+				$hook_register;
 	}
 
 	public static function isEventRegistered($pEvent) {
@@ -176,9 +233,9 @@ class Hook {
 	 * @param type $pReturn expected parameters return from the event handler
 	 * @throws RequiredEventHookNotRegisteredException
 	 */
-	public static function eventRequired($pEvent, $pParams, $pReturn) {
+	public static function eventRequired($pEvent) {
 		if (!isset(self::$hook_register[$pEvent]) || count(self::$hook_register[$pEvent]) == 0) {
-			throw new RequiredEventHookNotRegisteredException($pEvent, $pParams, $pReturn);
+			throw new RequiredEventHookNotRegisteredException($pEvent);
 		}
 	}
 
@@ -186,10 +243,8 @@ class Hook {
 
 class RequiredEventHookNotRegisteredException extends \Exception {
 
-	public function __construct($event, $params, $return) {
-		$params_string	 = implode(', $', $params);
-		$return_string	 = implode(',', $return);
-		parent::__construct("Cannot find Hook::register('$event',function($params_string ){   }); \nPlease add the above hook resister to capture $event and return array($return_string)");
+	public function __construct($event) {
+		parent::__construct("Cannot find Hook Handler for '$event'");
 	}
 
 }

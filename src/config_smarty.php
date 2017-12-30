@@ -29,7 +29,7 @@ function _SmartyView_Hook_Function($param, &$smarty) {
 		return '';
 
 	$param['params'] = $param;
-	$event = $param['event'];
+	$event			 = $param['event'];
 
 	return Hook::execute($event, $param, function($success, $hook_results) use ($event) {
 				$html = '';
@@ -83,9 +83,9 @@ function _SmartyView_Hidden_Function($params, &$smarty) {
 	$html = '';
 	foreach ($params as $key => $value) {
 		if (isset($params['model']))
-			$name_key = $params['model'] . '[' . $key . ']';
+			$name_key	 = $params['model'] . '[' . $key . ']';
 		else
-			$name_key = $key;
+			$name_key	 = $key;
 
 		$html .= "<INPUT type=hidden id=$key name=$name_key value=$value>";
 	}

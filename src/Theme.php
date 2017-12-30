@@ -7,6 +7,7 @@ class Theme extends Foundation {
 	private $current_theme = 'default';
 
 	public function __construct() {
+		parent::__construct();
 		$this->current_theme = Context::instance()->setup['default_theme'];
 	}
 
@@ -15,6 +16,7 @@ class Theme extends Foundation {
 	}
 
 	public function getCurrentThemePath($pNeedLogicalPath = false) {
+
 		if ($pNeedLogicalPath)
 			return str_replace('\\', '/', Context::instance()->setup['themes_path'] . DS . $this->current_theme . DS);
 		else
@@ -29,16 +31,16 @@ class Theme extends Foundation {
 	}
 
 	public function getTemplate($file, $throw_exception = true) {
-		$search_paths = [];
-		$search_paths[] = $file;
-		$search_paths[] = $file . '.html';
+		$search_paths	 = [];
+		$search_paths[]	 = $file;
+		$search_paths[]	 = $file . '.html';
 
 		foreach ($search_paths as $path) {
 
-			$this_path = realpath($path);
-			$mvc_path = realpath(MVC_DEFAULT_TEMPLATES . $path);
-			$full_path_default = realpath(Context::instance()->theme->getDefaultThemePath() . $path);
-			$full_path = realpath(Context::instance()->theme->getCurrentThemePath() . $path);
+			$this_path			 = realpath($path);
+			$mvc_path			 = realpath(MVC_DEFAULT_TEMPLATES . $path);
+			$full_path_default	 = realpath(Context::instance()->theme->getDefaultThemePath() . $path);
+			$full_path			 = realpath(Context::instance()->theme->getCurrentThemePath() . $path);
 
 			if ($this_path && file_exists($this_path))
 				return $this_path;

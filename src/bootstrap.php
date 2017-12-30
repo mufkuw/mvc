@@ -15,9 +15,6 @@ if (!defined('DS'))
 if (!defined('ROOT'))
 	define('ROOT', realpath($_SERVER['DOCUMENT_ROOT']) . DS);
 
-if (!defined('MVC_LOGICAL_ROOT'))
-	define('MVC_LOGICAL_ROOT', '/vendor/mufkuw/mvc/src/');
-
 if (!defined('MVC_ROOT')) {
 	define('MVC_ROOT', __DIR__);
 }
@@ -35,7 +32,9 @@ if (!defined('DEBUG'))
 
 error_reporting(0);
 
+
 register_shutdown_function(function() {
+
 	$e = error_get_last();
 	if ($e)
 		echo'<pre>ERROR<BR>' . $e['message'] . '<BR><BR>FILE<BR>' . $e['file'] . '(' . $e['line'] . ')</pre>';
@@ -111,7 +110,7 @@ function mvc_init($pSetup = []) {
 		'themes_path'		 => 'themes',
 		'modules_path'		 => 'modules',
 		'default_theme'		 => 'default',
-		'auto_route'		 => 1
+		'auto_dispatch'		 => 0
 	];
 
 	$pSetup = array_merge($default_setup, $pSetup);
@@ -140,8 +139,7 @@ function mvc_init($pSetup = []) {
 	}
 
 
-	Context::instance()->setup	 = $pSetup;
-	Context::instance()->route	 = Router::getRoute();
+	Context::instance()->setup = $pSetup;
 
 	if (isset($pSetup['cookie_name'])) {
 		Context::instance()->cookie = Cookie::instance($pSetup['cookie_name']);
@@ -149,11 +147,7 @@ function mvc_init($pSetup = []) {
 		Context::instance()->cookie = Cookie::instance();
 	}
 
-	Context::instance()->theme = Theme::instance();
-
-	Context::instance()->view = SmartyView::instance();
-
-	if ($pSetup['auto_route']) {
-		Controller::execute(Router::getRoute());
+	if ($pSetup['auto_dispatch'] && boolval($pSetup['auto_dispatch'])) {
+		Router::disptach();
 	}
 }

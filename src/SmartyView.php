@@ -11,9 +11,11 @@ class SmartyView extends Foundation {
 	 */
 	function __construct() {
 
+		parent::__construct();
+
 		$this->smarty = New \Smarty;
 
-		$cache_path = Context::instance()->cache_path;
+		$cache_path = Context::instance()->setup['cache_path'];
 
 		$this->smarty->setTemplateDir($cache_path . '/smarty/template/');
 		$this->smarty->setCompileDir($cache_path . '/smarty/compiled/');
@@ -53,11 +55,6 @@ class SmartyView extends Foundation {
 
 		$this->registerPlugin('modifier', 'null', [$this, '_SmartyView_Null_Modifier']);
 
-
-//		$this->registerPlugin('function', 'html_widget', [$this, 'Mvc\_SmartyView_Widget_Function']);
-//		$this->registerPlugin('function', 'alert', [$this, '_SmartyView_Widget_Alert_Function']);
-
-
 		SmartyViewWidgets::instance()->register($this);
 	}
 
@@ -66,7 +63,7 @@ class SmartyView extends Foundation {
 			return '';
 
 		$param['params'] = $param;
-		$event = $param['event'];
+		$event			 = $param['event'];
 
 		return Hook::execute($event, $param, function($success, $hook_results) use ($event) {
 					$html = '';
@@ -120,9 +117,9 @@ class SmartyView extends Foundation {
 		$html = '';
 		foreach ($params as $key => $value) {
 			if (isset($params['model']))
-				$name_key = $params['model'] . '[' . $key . ']';
+				$name_key	 = $params['model'] . '[' . $key . ']';
 			else
-				$name_key = $key;
+				$name_key	 = $key;
 
 			$html .= "<INPUT type=hidden id=$key name=$name_key value=$value>";
 		}

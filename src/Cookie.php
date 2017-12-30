@@ -8,9 +8,10 @@ define('COOKIE_IV', 'km=7uRt4');
 
 class Cookie {
 
-	private $data		 = array();
-	private $cookie_name = '';
-	private $password	 = '&N&6C[q%';
+	private $data			 = array();
+	private $cookie_name	 = '';
+	private $password		 = '&N&6C[q%';
+	private $cookies_saved	 = false;
 	private static $blowfish;
 	private static $instance;
 
@@ -21,7 +22,9 @@ class Cookie {
 	}
 
 	public function __destruct() {
-		$this->save($this->cookie_name);
+		if (!headers_sent()) {
+			$this->save();
+		}
 	}
 
 	public function set($prop, $value) {
@@ -51,7 +54,15 @@ class Cookie {
 		return isset($this->data[$prop]);
 	}
 
-	private function save($cookie_name) {
+	public function save() {
+		$this->save_cookies($this->cookie_name);
+	}
+
+	private function save_cookies($cookie_name) {
+
+		if ($this->cookies_saved)
+			return;
+
 		$cookie = '';
 
 		/* Serialize cookie content */
@@ -79,6 +90,8 @@ class Cookie {
 			$content = 0;
 			$time	 = 1;
 		}
+
+		$this->cookies_saved = true;
 
 		return setcookie($cookie_name, $content, $time, '/');
 	}

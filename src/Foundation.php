@@ -4,11 +4,14 @@ namespace Mvc;
 
 class Foundation {
 
-	private static $instances = [];
-	private $internal_data = [];
+	private static $instances	 = [];
+	private $internal_data		 = [];
 
 	public function __construct() {
-
+		$class = get_called_class();
+		if ($class != 'Mvc\Context' && !isset(Context::instance()->setup)) {
+			throw new \Exception("Trying to create new {$class} before mvc_init().");
+		}
 	}
 
 	public static function instance() {
@@ -28,6 +31,14 @@ class Foundation {
 			return $this->internal_data[$name];
 		else
 			return FALSE;
+	}
+
+	public function __unset($prop) {
+		unset($this->internal_data[$prop]);
+	}
+
+	public function __isset($prop) {
+		return isset($this->internal_data[$prop]);
 	}
 
 }

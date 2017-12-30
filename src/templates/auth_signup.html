@@ -1,0 +1,24 @@
+<div class="container">
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+			<h1>App Name</h1>
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<div class="panel-title">{fa icon="wpforms"} New Signup Form</div>
+				</div>
+				<div class="panel-body panel-primary">
+					<form role ="form" action="/api/auth/signup" method="post" submit-type='ajax' referer="{$referer|null:'/'}" data-toggle="validator">
+						{hidden area=$area|null:''}
+						{input id="username" label="Email address" icon="fa-user" type="email" placeholder="Enter email address" help="email address registered as username to $area area" required=true}
+						{input id="full_name" label="Full Name" icon="fa-info" type="text" placeholder="Enter full name" help="Your full name as first name and last name" required=true}
+						{input id="password" label="Password" icon="fa-lock" type="password" placeholder="Desired password to the $area area" help="" required=true}
+						{input id="repeat_password" label="Verify Password" icon="fa-lock" type="password" placeholder="Repeat same as password" help="" match='#password' required=true}
+						{checkbox id="agree_terms" label="Agree to <a href='/content/terms-and-condition.html'>Terms and Condition</a>" value=1 required=true  error="Please read the terms and condition and agree "}
+						<button type="submit" class="btn btn-primary">{fa icon='check'} Register</button>
+					</form>
+				</div>
+			</div>
+			<div id='page_alerts'>{$ALERTS}</div>
+		</div>
+	</div>
+</div>

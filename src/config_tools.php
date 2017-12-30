@@ -1,11 +1,35 @@
 <?php
 
 function print_pre($var, $return = false) {
-	$res = '<pre>' . print_r($var, true) . '</pre>';
+	$trace		 = debug_backtrace_of('print_pre');
+	$trace_info	 = "";
+	if ($trace) {
+		$trace_file_split	 = explode(DIRECTORY_SEPARATOR, $trace['file']);
+		$trace_info			 = array_pop($trace_file_split) . ' Line ' . $trace['line'];
+	}
+	$res = "<pre trace='{$trace_info}'>" . print_r($var, true) . "</pre>";
 	if ($return)
 		return $res;
 	else
 		echo $res;
+}
+
+/**
+ *
+ * @param type $function_name
+ * @return type
+ */
+function debug_backtrace_of($function_name) {
+	$backtrace	 = [];
+	$backtrace	 = array_filter(debug_backtrace(), function($i) use ($function_name) {
+		return (isset($i['function']) && preg_match_all("/$function_name/", $i['function']) > 0);
+	});
+
+	if (count($backtrace) > 0) {
+		return array_values($backtrace)[0];
+	} else {
+		return null;
+	}
 }
 
 function utf8_encode_deep(&$input) {
@@ -42,18 +66,27 @@ function raw_json_encode($input, $flags = 0) {
 	return preg_replace_callback($pattern, $callback, json_encode($input, $flags));
 }
 
-function rdir($dir, $include_dir = false) {
+function rdir($dir, $include_dir = false, $ignore_list = null) {
 	$results = array();
 	if (!realpath($dir))
 		return $results;
-	$files	 = scandir($dir);
+
+	if (!$ignore_list)
+		$ignore_list = '/\.git|vendor|nbproject/';
+
+	$files = array_filter(scandir($dir), function($i) use ($ignore_list, $dir) {
+
+		//print_pre([$dir, $i, preg_match_all($ignore_list, $dir . DS . $i)]);
+
+		return !(preg_match_all($ignore_list, $dir . DS . $i) > 0);
+	});
 	foreach ($files as $key => $value) {
 		$path = realpath($dir . DIRECTORY_SEPARATOR . $value);
 		if (!($value == '.' || $value == '..')) {
 			if (!is_dir($path) || $include_dir)
 				$results[]	 = ['dir' => realpath($dir), 'name' => $value];
 			if (is_dir($path))
-				$results	 = array_merge($results, rdir($path));
+				$results	 = array_merge($results, rdir($path, $include_dir, $ignore_list));
 		}
 	}
 	return $results;
@@ -267,6 +300,31 @@ function die_page_not_found() {
 function die_error() {
 	header($_SERVER["SERVER_PROTOCOL"] . " 500 Error", true, 500);
 	die();
+}
+
+function getAttributes($callable) {
+	$doc = "";
+
+	if (is_callable($callable)) {
+		if (is_array($callable) && count($callable) == 2) {
+			$ref = new \ReflectionMethod($callable[0], $callable[1]);
+			if ($ref)
+				$doc = $ref->getDocComment();
+		} else {
+			$ref = new \ReflectionFunction($callable);
+			if ($ref)
+				$doc = $ref->getDocComment();
+		}
+	}
+
+
+	$matches = [];
+	if (preg_match_all('/@attribute (.+?)[;]/', $doc, $matches) > 0) {
+		$str = implode('&', $matches[1]);
+		$ret = [];
+		parse_str($str, $ret);
+		return $ret;
+	}
 }
 
 /**

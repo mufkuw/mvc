@@ -7,9 +7,9 @@ class Router {
 	private static $routes = array();
 
 	private static function route($name, $pattern, $defaults = NULL) {
-		$matches = null;
+		$matches	 = null;
 		$returnValue = preg_match_all('\'\\{(.*?)\\}\'', $pattern, $matches);
-		$count = null;
+		$count		 = null;
 		$returnValue = preg_replace('\'\\{(.*?)\\}\'', '(\\w+)', $pattern, -1, $count);
 
 		//$pattern = $returnValue ;
@@ -37,17 +37,17 @@ class Router {
 
 			for ($i = 0; $i < $length; $i++) {
 				if (isset($route_keys[$i]))
-					$route_array[$route_keys[$i]] = isset($route_values[$i]) ? $route_values[$i] : '';
+					$route_array[$route_keys[$i]]	 = isset($route_values[$i]) ? $route_values[$i] : '';
 				else
-					$route_array[] = isset($route_values[$i]) ? $route_values[$i] : '';
+					$route_array[]					 = isset($route_values[$i]) ? $route_values[$i] : '';
 			}
 
 			$route = array_slice($route_array, 0, count($route_keys));
 
 			$route_params = array_slice($route_array, count($route_keys));
 
-			$param_keys = array_values(($matches[2]));
-			$param_values = array_values(($matches[3]));
+			$param_keys		 = array_values(($matches[2]));
+			$param_values	 = array_values(($matches[3]));
 
 			$param = array_combine($param_keys, $param_values);
 
@@ -67,13 +67,13 @@ class Router {
 
 			for ($i = 0; $i < $length; $i++) {
 				if (isset($route_keys[$i]))
-					$route_array[$route_keys[$i]] = isset($route_values[$i]) ? $route_values[$i] : '';
+					$route_array[$route_keys[$i]]	 = isset($route_values[$i]) ? $route_values[$i] : '';
 				else
-					$route_array[] = isset($route_values[$i]) ? $route_values[$i] : '';
+					$route_array[]					 = isset($route_values[$i]) ? $route_values[$i] : '';
 			}
 
-			$route = array_slice($route_array, 0, count($route_keys));
-			$route_params = array_slice($route_array, count($route_keys));
+			$route			 = array_slice($route_array, 0, count($route_keys));
+			$route_params	 = array_slice($route_array, count($route_keys));
 
 			$route['params'] = $route_params;
 
@@ -115,8 +115,8 @@ class Router {
 				$params = array_merge($params_defaults, $params);
 
 				if (array_key_exists('controller', $params) && array_key_exists('action', $params)) {
-					$controller_class = $params['controller'];
-					$action = $params['action'];
+					$controller_class	 = $params['controller'];
+					$action				 = $params['action'];
 
 					$route_params = $params;
 
@@ -133,8 +133,8 @@ class Router {
 		}
 
 		if ($route && array_key_exists('controller', $route) && array_key_exists('action', $route)) {
-			$controller_class = $route['controller'];
-			$action = $route['action'];
+			$controller_class	 = $route['controller'];
+			$action				 = $route['action'];
 			return $route;
 		}
 
@@ -144,6 +144,12 @@ class Router {
 
 	public static function addRoute($name, $pattern, $defaults = NULL) {
 		self::route($name, $pattern, $defaults);
+	}
+
+	public static function dispatch($route = null) {
+		if (!$route)
+			$route = self::getRoute();
+		Controller::execute($route);
 	}
 
 }
