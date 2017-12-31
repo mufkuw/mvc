@@ -32,14 +32,14 @@ class Media extends Foundation {
 				$media_path = $this->getCss($media, $module);
 			}
 
+			//print_pre([$media, $media_path]);
+
 			if ($media != $media_path) {
 				$validate	 = false;
 				$media_path	 = "/media/$type/$media.$type";
 			}
 
-
-
-			if (($validate && realpath(ROOT . $media_path)) || !$validate) {
+			if (($validate && realpath($media_path)) || !$validate) {
 				$this->media_files[$type][]	 = $media_path;
 				$this->media_files[$type]	 = array_unique($this->media_files[$type]);
 			}
@@ -67,12 +67,13 @@ class Media extends Foundation {
 		$html = '';
 
 		foreach ($this->media_files[$type] as $media) {
+
 			$html .= str_replace('{MEDIA}', $media, $media_template[$type]);
 		}
 
 		return "<!--Start $this->scope ($type) -->"
-				. $html
-				. "<!--End $this->scope ($type) -->";
+			. $html
+			. "<!--End $this->scope ($type) -->";
 	}
 
 	public function renderJs() {
@@ -85,24 +86,37 @@ class Media extends Foundation {
 
 	private function getMedia($type, $file, $module = '') {
 
-		$theme = Theme::instance();
-
 		if (!$file)
 			return $file;
 
+		$theme = Theme::instance();
 
-		$search_paths	 = array();
-		$search_paths[]	 = $file;
-		$search_paths[]	 = $theme->getCurrentThemePath() . '' . $type . '/' . $file;
-		$search_paths[]	 = $theme->getDefaultThemePath() . '' . $type . '/' . $file;
-		$search_paths[]	 = MVC_MEDIA . '' . $type . DS . $file;
-		$search_paths[]	 = ROOT . Context::instance()->setup['modules_path'] . $module . DS . $type . DS . $file;
+		$search_paths = [
+			$file
+			, ($module != '' ? ROOT . Context::instance()->setup['modules_path'] . $module . DS . $type . DS . $file : null)
+			, $theme->getCurrentThemePath() . $type . DS . $file
+			, $theme->getDefaultThemePath() . $type . DS . $file
+		];
+
+
+		foreach (array_reverse(Context::instance()->search_sequence_media) as $search_sequence) {
+			$search_paths[] = $search_sequence . $type . DS . $file;
+		}
+
+		//print_pre($search_paths);
+//
+//		$search_paths	 = array();
+//		$search_paths[]	 = $file;
+//		$search_paths[]	 = $theme->getCurrentThemePath() . '' . $type . '/' . $file;
+//		$search_paths[]	 = $theme->getDefaultThemePath() . '' . $type . '/' . $file;
+//		$search_paths[]	 = MVC_MEDIA . '' . $type . DS . $file;
+//
 
 		foreach ($search_paths as $path) {
 
-			if (realpath($path))
+			if (realpath($path) && file_exists($path))
 				return $path;
-			if (realpath($path . '.' . $type))
+			if (realpath($path . '.' . $type) && file_exists($path . '.' . $type))
 				return $path . '.' . $type;
 		}
 

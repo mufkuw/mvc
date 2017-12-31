@@ -8,32 +8,15 @@ define('MVC_FOUNDATION_CLASS', MVC_CLASSES . 'Foundation.php');
 define('MVC_TEMPLATES', MVC_ROOT . 'templates' . DS);
 define('MVC_MEDIA', MVC_ROOT . 'media' . DS);
 define('MVC_TEMPLATES_EXT', '.html');
+define('MVC_CLASS_INDEX_JSON', MVC_CONFIG . 'class_index.json');
 
 require MVC_CONFIG . "startup_scripts.php";
 require_once MVC_FOUNDATION_CLASS;
 
-//preloading classes
-(function() {
-	$json_file	 = MVC_CONFIG . 'class_index.json';
-	$classes	 = json_read($json_file);
-	if (!$classes) {
-		$classes = preload(MVC_CLASSES, MVC_CONTROLLERS);
-		json_write($classes, $json_file);
-	} else {
-		foreach ($classes as $class) {
-			require_once $class;
-		}
-	}
-})();
 
-use Mvc\{
-	Context,
-	Router,
-	Controller,
-	Cookie,
-	Theme,
-	SmartyView
-};
+preload(MVC_CLASS_INDEX_JSON, MVC_CLASSES, MVC_CONTROLLERS);
+
+use Mvc\{Context, Router, Controller, Cookie, Theme, SmartyView};
 
 /**
  * Instantiate the MVC pattern
@@ -104,6 +87,7 @@ function mvc_init($pSetup = []) {
 
 	Context::instance()->search_sequence_controllers_namespaces[]	 = '\\Mvc\\Controllers';
 	Context::instance()->search_sequence_templates[]				 = MVC_TEMPLATES;
+	Context::instance()->search_sequence_media[]					 = MVC_MEDIA;
 
 	if (isset($pSetup['cookie_name'])) {
 		Context::instance()->cookie = Cookie::instance($pSetup['cookie_name']);

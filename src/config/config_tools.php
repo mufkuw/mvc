@@ -176,8 +176,8 @@ function getMethodNameRegEX($name, $pPattern) {
 
 function is_json($string) {
 	return ((is_string($string) &&
-			(is_object(json_decode($string)) ||
-			is_array(json_decode($string))))) ? true : false;
+		(is_object(json_decode($string)) ||
+		is_array(json_decode($string))))) ? true : false;
 }
 
 class StopWatch {
@@ -338,15 +338,31 @@ function get_php_files($path) {
 	return $files;
 }
 
-function preload(...$paths) {
-	$files = [];
-	foreach ($paths as $path) {
-		array_filter(get_php_files($path), function($file) use (&$files) {
-			$files[] = $file['dir'] . DIRECTORY_SEPARATOR . $file['name'];
-			require_once $file['dir'] . DIRECTORY_SEPARATOR . $file['name'];
-		});
+/**
+ *
+ * @param string $json_file
+ * @param type $paths
+ */
+function preload($json_file, ...$paths) {
+
+	//$json_file	 = MVC_CONFIG . 'class_index.json';
+	$classes = json_read($json_file);
+
+	if (!$classes) {
+		$classes = [];
+		foreach ($paths as $path) {
+			array_filter(get_php_files($path), function($file) use (&$classes) {
+				$classes[] = $file['dir'] . DIRECTORY_SEPARATOR . $file['name'];
+				require_once $file['dir'] . DIRECTORY_SEPARATOR . $file['name'];
+			});
+		}
+		json_write($classes, $json_file);
+	} else {
+		foreach ($classes as $class) {
+			require_once $class;
+		}
 	}
-	return $files;
+	return $classes;
 }
 
 function json_write($object, $file) {

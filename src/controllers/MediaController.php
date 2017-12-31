@@ -21,7 +21,7 @@ class MediaController extends Controller {
 		$content = file_get_contents($file);
 		if ($file) {
 			ob_start();
-			echo $content;
+			echo $this->minify_js($content);
 			$expires = 60 * 60 * 24;
 			header("Content-type: x-javascript");
 			header('Content-Length: ' . ob_get_length());
@@ -39,7 +39,7 @@ class MediaController extends Controller {
 		if ($file) {
 
 			ob_start();
-			echo $content;
+			echo $this->minify_css($content);
 			$expires = 60 * 60 * 24;
 			header('content-type: text/css');
 			header('Content-Length: ' . ob_get_length());
